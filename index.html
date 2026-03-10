@@ -1,0 +1,1187 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>🎂 BIRTHDAY QUEST</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+  /* ===================== RESET & BASE ===================== */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0a0a1a;
+    --bg2: #0f0f2e;
+    --green: #00ff41;
+    --yellow: #ffe600;
+    --cyan: #00e5ff;
+    --pink: #ff4da6;
+    --purple: #b44fff;
+    --red: #ff3c3c;
+    --white: #e8e8e8;
+    --gray: #444466;
+    --border: 3px solid;
+    --pixel: 'Press Start 2P', monospace;
+  }
+
+  html, body {
+    width: 100%; height: 100%;
+    background: var(--bg);
+    color: var(--white);
+    font-family: var(--pixel);
+    font-size: 10px;
+    overflow: hidden;
+  }
+
+  /* ===================== STARFIELD ===================== */
+  #stars {
+    position: fixed; inset: 0;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ===================== SCREENS ===================== */
+  .screen {
+    position: fixed; inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    z-index: 10;
+    padding: 16px;
+    overflow-y: auto;
+    opacity: 0;
+    transition: opacity 0.4s;
+    pointer-events: none;
+  }
+  .screen.active {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  /* ===================== TITLE SCREEN ===================== */
+  #screen-title {
+    background: var(--bg);
+    gap: 24px;
+    text-align: center;
+  }
+  .title-box {
+    border: var(--border) var(--yellow);
+    padding: 20px 16px;
+    background: var(--bg2);
+    box-shadow: 4px 4px 0 var(--yellow);
+    max-width: 340px;
+    width: 100%;
+  }
+  .title-main {
+    font-size: 18px;
+    color: var(--yellow);
+    letter-spacing: 2px;
+    text-shadow: 0 0 12px var(--yellow);
+    animation: blink-glow 1.5s infinite alternate;
+    line-height: 1.6;
+  }
+  .title-sub {
+    font-size: 9px;
+    color: var(--cyan);
+    margin-top: 12px;
+    line-height: 1.8;
+  }
+  .title-names {
+    font-size: 11px;
+    color: var(--pink);
+    margin-top: 16px;
+    line-height: 2;
+    text-shadow: 0 0 8px var(--pink);
+  }
+  .press-start {
+    font-size: 9px;
+    color: var(--green);
+    animation: blink 1s step-end infinite;
+    margin-top: 8px;
+  }
+
+  /* ===================== MAP SCREEN ===================== */
+  #screen-map {
+    background: var(--bg);
+    justify-content: flex-start;
+    padding-top: 20px;
+    gap: 0;
+  }
+  .map-title {
+    font-size: 10px;
+    color: var(--yellow);
+    text-align: center;
+    margin-bottom: 20px;
+    letter-spacing: 2px;
+  }
+  .map-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    width: 100%;
+    max-width: 320px;
+  }
+  .stage-node {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 0 8px;
+  }
+  .stage-btn {
+    flex: 1;
+    border: var(--border) var(--green);
+    background: var(--bg2);
+    color: var(--green);
+    font-family: var(--pixel);
+    font-size: 8px;
+    padding: 10px 8px;
+    cursor: pointer;
+    text-align: left;
+    box-shadow: 3px 3px 0 var(--green);
+    transition: transform 0.1s, box-shadow 0.1s;
+    position: relative;
+    line-height: 1.8;
+  }
+  .stage-btn:active {
+    transform: translate(3px, 3px);
+    box-shadow: 0 0 0 var(--green);
+  }
+  .stage-btn.locked {
+    border-color: var(--gray);
+    color: var(--gray);
+    box-shadow: 3px 3px 0 var(--gray);
+    cursor: not-allowed;
+  }
+  .stage-btn.completed {
+    border-color: var(--cyan);
+    color: var(--cyan);
+    box-shadow: 3px 3px 0 var(--cyan);
+  }
+  .stage-btn.active-stage {
+    border-color: var(--yellow);
+    color: var(--yellow);
+    box-shadow: 3px 3px 0 var(--yellow);
+    animation: pulse-border 1s infinite alternate;
+  }
+  .stage-badge {
+    font-size: 7px;
+    margin-top: 4px;
+  }
+  .coop-tag {
+    font-size: 6px;
+    color: var(--pink);
+    background: #1a0022;
+    border: 1px solid var(--pink);
+    padding: 2px 4px;
+    margin-left: 4px;
+  }
+  .path-line {
+    width: 3px;
+    height: 28px;
+    margin: 0 auto;
+    background: repeating-linear-gradient(
+      to bottom,
+      var(--green) 0px,
+      var(--green) 4px,
+      transparent 4px,
+      transparent 8px
+    );
+  }
+  .path-line.locked-path {
+    background: repeating-linear-gradient(
+      to bottom,
+      var(--gray) 0px,
+      var(--gray) 4px,
+      transparent 4px,
+      transparent 8px
+    );
+  }
+  .progress-bar-wrap {
+    width: 100%;
+    max-width: 320px;
+    margin-top: 16px;
+    padding: 0 8px;
+  }
+  .progress-label {
+    font-size: 7px;
+    color: var(--cyan);
+    margin-bottom: 6px;
+  }
+  .progress-bar-outer {
+    border: 2px solid var(--cyan);
+    height: 14px;
+    background: var(--bg2);
+  }
+  .progress-bar-inner {
+    height: 100%;
+    background: var(--cyan);
+    transition: width 0.6s;
+  }
+
+  /* ===================== STAGE SCREEN ===================== */
+  #screen-stage {
+    background: rgba(10,10,26,0.97);
+    gap: 12px;
+    justify-content: flex-end;
+    padding-bottom: 24px;
+  }
+  .stage-scene {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 64px;
+    text-align: center;
+    animation: float 3s ease-in-out infinite;
+  }
+  .dialog-box {
+    width: 100%;
+    max-width: 380px;
+    border: var(--border) var(--white);
+    background: var(--bg);
+    box-shadow: 4px 4px 0 var(--white);
+    padding: 16px;
+  }
+  .dialog-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--gray);
+  }
+  .npc-avatar {
+    font-size: 22px;
+    line-height: 1;
+  }
+  .npc-name {
+    font-size: 8px;
+    color: var(--yellow);
+  }
+  .stage-num {
+    font-size: 7px;
+    color: var(--gray);
+    margin-left: auto;
+  }
+  .dialog-text {
+    font-size: 8px;
+    line-height: 2;
+    color: var(--white);
+    min-height: 48px;
+  }
+  .cursor {
+    display: inline-block;
+    width: 8px;
+    height: 14px;
+    background: var(--white);
+    vertical-align: middle;
+    animation: blink 0.7s step-end infinite;
+    margin-left: 2px;
+  }
+  .dialog-choices {
+    margin-top: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .choice-btn {
+    border: 2px solid var(--green);
+    background: var(--bg2);
+    color: var(--green);
+    font-family: var(--pixel);
+    font-size: 8px;
+    padding: 8px 10px;
+    text-align: left;
+    cursor: pointer;
+    transition: background 0.1s;
+  }
+  .choice-btn:hover, .choice-btn:active {
+    background: var(--green);
+    color: var(--bg);
+  }
+  .choice-btn::before { content: '▶ '; }
+
+  .input-row {
+    display: flex;
+    gap: 6px;
+    margin-top: 12px;
+  }
+  .pixel-input {
+    flex: 1;
+    border: 2px solid var(--cyan);
+    background: var(--bg2);
+    color: var(--cyan);
+    font-family: var(--pixel);
+    font-size: 9px;
+    padding: 8px;
+    outline: none;
+    letter-spacing: 2px;
+  }
+  .pixel-input::placeholder { color: var(--gray); }
+  .confirm-btn {
+    border: 2px solid var(--yellow);
+    background: var(--bg2);
+    color: var(--yellow);
+    font-family: var(--pixel);
+    font-size: 8px;
+    padding: 8px 10px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .confirm-btn:active {
+    background: var(--yellow);
+    color: var(--bg);
+  }
+  .result-msg {
+    margin-top: 10px;
+    font-size: 8px;
+    line-height: 1.8;
+    min-height: 20px;
+  }
+  .result-msg.ok { color: var(--green); }
+  .result-msg.fail { color: var(--red); animation: shake 0.3s; }
+
+  .coop-info {
+    margin-top: 10px;
+    border: 2px solid var(--pink);
+    padding: 10px;
+    font-size: 7px;
+    line-height: 2;
+    color: var(--pink);
+    background: #1a0022;
+  }
+  .coop-code {
+    font-size: 14px;
+    color: var(--yellow);
+    letter-spacing: 4px;
+    text-align: center;
+    margin: 8px 0;
+    text-shadow: 0 0 8px var(--yellow);
+  }
+
+  .player-switch {
+    display: flex;
+    gap: 6px;
+    margin-top: 10px;
+  }
+  .psw-btn {
+    flex: 1;
+    border: 2px solid var(--purple);
+    background: var(--bg2);
+    color: var(--purple);
+    font-family: var(--pixel);
+    font-size: 7px;
+    padding: 7px 4px;
+    cursor: pointer;
+    text-align: center;
+  }
+  .psw-btn.active {
+    background: var(--purple);
+    color: var(--bg);
+  }
+
+  /* ===================== ENDING SCREEN ===================== */
+  #screen-ending {
+    background: var(--bg);
+    gap: 20px;
+    text-align: center;
+  }
+  .ending-title {
+    font-size: 14px;
+    color: var(--yellow);
+    text-shadow: 0 0 16px var(--yellow), 0 0 32px var(--yellow);
+    line-height: 1.8;
+    animation: blink-glow 1s infinite alternate;
+  }
+  .ending-box {
+    border: var(--border) var(--pink);
+    padding: 20px 16px;
+    background: var(--bg2);
+    box-shadow: 4px 4px 0 var(--pink);
+    max-width: 340px;
+    width: 100%;
+  }
+  .ending-text {
+    font-size: 8px;
+    line-height: 2.4;
+    color: var(--white);
+  }
+  .ending-names {
+    font-size: 12px;
+    color: var(--pink);
+    margin-top: 16px;
+    text-shadow: 0 0 10px var(--pink);
+    line-height: 2;
+  }
+  #canvas-fireworks {
+    position: fixed; inset: 0;
+    pointer-events: none;
+    z-index: 5;
+  }
+
+  /* ===================== BACK BTN ===================== */
+  .back-btn {
+    position: fixed;
+    top: 12px; left: 12px;
+    z-index: 100;
+    border: 2px solid var(--gray);
+    background: var(--bg2);
+    color: var(--gray);
+    font-family: var(--pixel);
+    font-size: 8px;
+    padding: 6px 10px;
+    cursor: pointer;
+    display: none;
+  }
+  .back-btn.show { display: block; }
+
+  /* ===================== NOTIFICATION ===================== */
+  #notif {
+    position: fixed;
+    top: 16px; left: 50%;
+    transform: translateX(-50%) translateY(-60px);
+    z-index: 200;
+    border: 3px solid var(--green);
+    background: var(--bg);
+    color: var(--green);
+    font-family: var(--pixel);
+    font-size: 8px;
+    padding: 10px 16px;
+    box-shadow: 4px 4px 0 var(--green);
+    transition: transform 0.3s;
+    white-space: nowrap;
+    text-align: center;
+  }
+  #notif.show {
+    transform: translateX(-50%) translateY(0);
+  }
+  #notif.error {
+    border-color: var(--red);
+    color: var(--red);
+    box-shadow: 4px 4px 0 var(--red);
+  }
+
+  /* ===================== ANIMATIONS ===================== */
+  @keyframes blink {
+    50% { opacity: 0; }
+  }
+  @keyframes blink-glow {
+    from { text-shadow: 0 0 8px currentColor; }
+    to { text-shadow: 0 0 24px currentColor, 0 0 40px currentColor; }
+  }
+  @keyframes pulse-border {
+    from { box-shadow: 3px 3px 0 var(--yellow); }
+    to { box-shadow: 3px 3px 0 var(--yellow), 0 0 12px var(--yellow); }
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-6px); }
+    75% { transform: translateX(6px); }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="stars"></canvas>
+<canvas id="canvas-fireworks"></canvas>
+
+<button class="back-btn" id="back-btn" onclick="goMap()">◀ MAP</button>
+
+<div id="notif"></div>
+
+<!-- ==================== TITLE SCREEN ==================== -->
+<div class="screen active" id="screen-title">
+  <div class="title-box">
+    <div class="title-main">🎂<br>BIRTHDAY<br>QUEST</div>
+    <div class="title-sub">── SPECIAL EDITION ──</div>
+    <div class="title-names">✨ PLAYER 1 &amp; PLAYER 2 ✨<br>LV.27 × LV.27</div>
+    <div class="press-start">▶ PRESS START ◀</div>
+  </div>
+  <button onclick="startGame()" style="
+    border: 3px solid var(--green);
+    background: var(--bg2);
+    color: var(--green);
+    font-family: var(--pixel);
+    font-size: 10px;
+    padding: 14px 28px;
+    cursor: pointer;
+    box-shadow: 4px 4px 0 var(--green);
+    letter-spacing: 2px;
+  ">START GAME</button>
+  <div style="font-size:7px;color:var(--gray);text-align:center;line-height:2">
+    ⚔️ CO-OP MODE AVAILABLE<br>SHARE LINK WITH ?p=1 OR ?p=2
+  </div>
+</div>
+
+<!-- ==================== MAP SCREEN ==================== -->
+<div class="screen" id="screen-map">
+  <div class="map-title">🗺️ WORLD MAP</div>
+  <div class="map-container" id="map-container"></div>
+  <div class="progress-bar-wrap">
+    <div class="progress-label">PROGRESS: <span id="progress-text">0/5</span></div>
+    <div class="progress-bar-outer">
+      <div class="progress-bar-inner" id="progress-bar" style="width:0%"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== STAGE SCREEN ==================== -->
+<div class="screen" id="screen-stage">
+  <div class="stage-scene" id="stage-scene">🎮</div>
+  <div class="dialog-box" id="dialog-box">
+    <div class="dialog-header">
+      <span class="npc-avatar" id="npc-avatar">👾</span>
+      <span class="npc-name" id="npc-name">???</span>
+      <span class="stage-num" id="stage-num">STAGE 0</span>
+    </div>
+    <div class="dialog-text" id="dialog-text"></div>
+    <div id="stage-content"></div>
+  </div>
+</div>
+
+<!-- ==================== ENDING SCREEN ==================== -->
+<div class="screen" id="screen-ending">
+  <div class="ending-title">🎉 QUEST<br>COMPLETE!</div>
+  <div class="ending-box">
+    <div class="ending-text" id="ending-text"></div>
+    <div class="ending-names">🌟 壽星 P1 & P2 🌟<br>生日快樂！</div>
+  </div>
+  <div style="font-size:7px;color:var(--gray);text-align:center;line-height:2">
+    THANK YOU FOR PLAYING<br>♥ LV.27 BIRTHDAY QUEST ♥
+  </div>
+</div>
+
+<script>
+// ===================== CONFIG =====================
+// 🔧 修改這裡來客製化遊戲內容！
+const CONFIG = {
+  player1Name: '壽星甲',   // ← 改成第一位壽星名字
+  player2Name: '壽星乙',   // ← 改成第二位壽星名字
+  endingMessage: [         // ← 改成你的祝福語（每行一個字串）
+    '恭喜你們解開了',
+    '所有的謎題！',
+    '',
+    '27 歲，是一個',
+    '充滿勇氣的年紀。',
+    '',
+    '願你們的每一天',
+    '都像冒險一樣',
+    '精彩！',
+    '',
+    '生日快樂 ♥',
+  ],
+};
+
+// ===================== STAGES =====================
+// 🔧 修改 stages 陣列來更換題目！
+const stages = [
+  // ── STAGE 1：選擇題 ──
+  {
+    id: 1,
+    title: 'STAGE 1',
+    name: '神秘勇者',
+    avatar: '🧙',
+    scene: '⚔️',
+    type: 'choice',
+    dialog: '勇者，歡迎來到生日迷宮！\n\n第一關：關於壽星的靈魂拷問...\n\n他們 27 歲最想做的事是？',
+    choices: [
+      { text: '環遊世界', correct: false },
+      { text: '贏得樂透', correct: false },
+      { text: '好好睡一覺', correct: true },   // ← 改成正確答案
+      { text: '買新手遊', correct: false },
+    ],
+    wrongMsg: '❌ 不對！再想想...',
+    correctMsg: '✅ 正確！你真的很了解他們！',
+  },
+
+  // ── STAGE 2：密碼輸入 ──
+  {
+    id: 2,
+    title: 'STAGE 2',
+    name: '守門魔法師',
+    avatar: '🔮',
+    scene: '🏰',
+    type: 'password',
+    dialog: '要通過這道門，\n你必須證明你的心意。\n\n請對著螢幕大聲說：\n「生日快樂！」\n\n說完後，輸入暗語：',
+    answer: 'HAPPY',              // ← 改成你要的密碼（會自動轉大寫比對）
+    placeholder: '輸入暗語...',
+    wrongMsg: '❌ 暗語錯誤！重新說一次吧！',
+    correctMsg: '✅ 魔法門打開了！',
+  },
+
+  // ── STAGE 3：合力 Type C（各看一半密碼）──
+  {
+    id: 3,
+    title: 'STAGE 3',
+    name: '古老石板',
+    avatar: '📜',
+    scene: '🗿',
+    type: 'coop-c',
+    dialog: '這道謎題需要兩位勇者\n各自找到線索，\n合力解開封印！\n\n📱 P1 和 P2 各自\n   查看自己的手機！',
+    // 兩半密碼（合體 = p1Code + p2Code）
+    p1Code: '27-',               // ← P1 看到的一半
+    p2Code: '2025',              // ← P2 看到的一半
+    placeholder: '輸入完整密碼...',
+    wrongMsg: '❌ 密碼不對！兩個人再確認一次！',
+    correctMsg: '✅ 封印解除！雙人力量萬歲！',
+  },
+
+  // ── STAGE 4：合力 Type A（各自答各自的題）──
+  {
+    id: 4,
+    title: 'STAGE 4',
+    name: '試煉祭壇',
+    avatar: '⚡',
+    scene: '🌋',
+    type: 'coop-a',
+    dialog: '最終考驗！\n兩位勇者必須各自通過\n關於對方的考題！\n\n選擇你的角色：',
+    p1: {
+      question: 'P1 的問題：\n壽星乙 最怕什麼？',
+      choices: [
+        { text: '蟑螂', correct: true },   // ← 改成正確答案
+        { text: '黑暗', correct: false },
+        { text: '高空', correct: false },
+        { text: '考試', correct: false },
+      ],
+    },
+    p2: {
+      question: 'P2 的問題：\n壽星甲 的絕招是？',
+      choices: [
+        { text: '睡覺治百病', correct: false },
+        { text: '一秒找到吃的', correct: true }, // ← 改成正確答案
+        { text: '電影百科全書', correct: false },
+        { text: '永遠不遲到', correct: false },
+      ],
+    },
+    wrongMsg: '❌ 答錯了！再試一次！',
+    correctMsg: '✅ 通過！你真的很了解對方！',
+  },
+
+  // ── STAGE 5：終極密碼 ──
+  {
+    id: 5,
+    title: 'STAGE 5',
+    name: '終極 BOSS',
+    avatar: '👑',
+    scene: '🐉',
+    type: 'password',
+    dialog: '恭喜抵達最終關卡！\n\nBOSS 問：\n兩位壽星合起來幾歲？\n\n輸入數字密碼：',
+    answer: '54',                // ← 27+27=54，可自行修改
+    placeholder: '輸入數字...',
+    wrongMsg: '❌ BOSS 大笑：「算術不好！」',
+    correctMsg: '✅ BOSS 被打敗了！！！',
+  },
+];
+
+// ===================== STATE =====================
+let currentStage = null;
+let typingTimer = null;
+const params = new URLSearchParams(location.search);
+const playerNum = parseInt(params.get('p')) || 0; // 0 = 無指定, 1 = P1, 2 = P2
+
+function getProgress() {
+  return JSON.parse(localStorage.getItem('bq-progress') || '[]');
+}
+function setProgress(arr) {
+  localStorage.setItem('bq-progress', JSON.stringify(arr));
+}
+function isCompleted(id) {
+  return getProgress().includes(id);
+}
+function markComplete(id) {
+  const p = getProgress();
+  if (!p.includes(id)) { p.push(id); setProgress(p); }
+}
+
+// ===================== STARS =====================
+(function initStars() {
+  const c = document.getElementById('stars');
+  const ctx = c.getContext('2d');
+  let stars = [];
+  function resize() {
+    c.width = window.innerWidth;
+    c.height = window.innerHeight;
+    stars = Array.from({length: 80}, () => ({
+      x: Math.random() * c.width,
+      y: Math.random() * c.height,
+      r: Math.random() * 1.5 + 0.5,
+      a: Math.random(),
+      da: (Math.random() * 0.005 + 0.002) * (Math.random() < 0.5 ? 1 : -1),
+    }));
+  }
+  function draw() {
+    ctx.clearRect(0, 0, c.width, c.height);
+    stars.forEach(s => {
+      s.a += s.da;
+      if (s.a > 1 || s.a < 0) s.da *= -1;
+      ctx.fillStyle = `rgba(200,220,255,${s.a})`;
+      ctx.fillRect(s.x, s.y, s.r * 2, s.r * 2); // pixel squares
+    });
+    requestAnimationFrame(draw);
+  }
+  window.addEventListener('resize', resize);
+  resize(); draw();
+})();
+
+// ===================== FIREWORKS =====================
+let fwActive = false;
+(function initFireworks() {
+  const c = document.getElementById('canvas-fireworks');
+  const ctx = c.getContext('2d');
+  let particles = [];
+  function resize() { c.width = window.innerWidth; c.height = window.innerHeight; }
+  window.addEventListener('resize', resize); resize();
+
+  function spawnBurst(x, y) {
+    const colors = ['#ffe600','#ff4da6','#00e5ff','#00ff41','#b44fff','#ff3c3c'];
+    for (let i = 0; i < 40; i++) {
+      const angle = (Math.PI * 2 * i) / 40 + Math.random() * 0.3;
+      const speed = Math.random() * 5 + 2;
+      particles.push({
+        x, y,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        life: 1,
+        size: Math.random() * 5 + 3,
+      });
+    }
+  }
+
+  function loop() {
+    if (!fwActive) { requestAnimationFrame(loop); return; }
+    ctx.fillStyle = 'rgba(10,10,26,0.18)';
+    ctx.fillRect(0, 0, c.width, c.height);
+    particles.forEach(p => {
+      p.x += p.vx; p.y += p.vy;
+      p.vy += 0.1; p.life -= 0.015;
+      ctx.globalAlpha = p.life;
+      ctx.fillStyle = p.color;
+      ctx.fillRect(p.x, p.y, p.size, p.size);
+    });
+    ctx.globalAlpha = 1;
+    particles = particles.filter(p => p.life > 0);
+    requestAnimationFrame(loop);
+  }
+  loop();
+
+  window.spawnBurst = spawnBurst;
+  window.startFireworks = function() {
+    fwActive = true;
+    let count = 0;
+    const iv = setInterval(() => {
+      spawnBurst(
+        Math.random() * window.innerWidth,
+        Math.random() * window.innerHeight * 0.7
+      );
+      if (++count > 30) clearInterval(iv);
+    }, 200);
+  };
+})();
+
+// ===================== 8-BIT SOUNDS =====================
+const AudioCtx = window.AudioContext || window.webkitAudioContext;
+let actx = null;
+function getACtx() {
+  if (!actx) actx = new AudioCtx();
+  return actx;
+}
+function playTone(freq, dur, type='square', vol=0.15) {
+  try {
+    const ctx = getACtx();
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    o.connect(g); g.connect(ctx.destination);
+    o.type = type; o.frequency.value = freq;
+    g.gain.setValueAtTime(vol, ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
+    o.start(); o.stop(ctx.currentTime + dur);
+  } catch(e) {}
+}
+function soundCorrect() {
+  playTone(523, 0.1); setTimeout(()=>playTone(659,0.1),100); setTimeout(()=>playTone(784,0.2),200);
+}
+function soundWrong() {
+  playTone(200, 0.15, 'sawtooth'); setTimeout(()=>playTone(150,0.2,'sawtooth'),160);
+}
+function soundClear() {
+  [523,587,659,784,880].forEach((f,i)=>setTimeout(()=>playTone(f,0.15),i*100));
+}
+
+// ===================== NOTIFICATIONS =====================
+let notifTimer = null;
+function showNotif(msg, isError=false) {
+  const el = document.getElementById('notif');
+  el.textContent = msg;
+  el.className = 'show' + (isError ? ' error' : '');
+  clearTimeout(notifTimer);
+  notifTimer = setTimeout(() => el.className = '', 2500);
+}
+
+// ===================== SCREENS =====================
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  const backBtn = document.getElementById('back-btn');
+  backBtn.className = id === 'screen-stage' ? 'back-btn show' : 'back-btn';
+}
+
+// ===================== START =====================
+function startGame() {
+  playTone(440, 0.1);
+  showScreen('screen-map');
+  renderMap();
+}
+
+// ===================== MAP =====================
+function renderMap() {
+  const container = document.getElementById('map-container');
+  const progress = getProgress();
+  const completedCount = progress.length;
+  document.getElementById('progress-text').textContent = completedCount + '/5';
+  document.getElementById('progress-bar').style.width = (completedCount / 5 * 100) + '%';
+
+  container.innerHTML = '';
+  stages.forEach((stage, i) => {
+    const unlocked = i === 0 || progress.includes(stages[i-1].id);
+    const completed = progress.includes(stage.id);
+    const isNext = unlocked && !completed;
+
+    // Node
+    const node = document.createElement('div');
+    node.className = 'stage-node';
+
+    const btn = document.createElement('button');
+    btn.className = 'stage-btn' + (completed ? ' completed' : unlocked ? (isNext ? ' active-stage' : '') : ' locked');
+
+    const isCoop = stage.type === 'coop-c' || stage.type === 'coop-a';
+    btn.innerHTML =
+      `<div>${completed ? '✅' : unlocked ? '⚔️' : '🔒'} ${stage.title}</div>` +
+      `<div class="stage-badge">${completed ? 'CLEAR' : unlocked ? 'ENTER' : 'LOCKED'}${isCoop ? '<span class="coop-tag">⚔️CO-OP</span>' : ''}</div>`;
+
+    if (unlocked) {
+      btn.onclick = () => enterStage(stage);
+    }
+    node.appendChild(btn);
+    container.appendChild(node);
+
+    // Path line (not after last)
+    if (i < stages.length - 1) {
+      const line = document.createElement('div');
+      line.className = 'path-line' + (unlocked ? '' : ' locked-path');
+      container.appendChild(line);
+    }
+  });
+}
+
+// ===================== ENTER STAGE =====================
+function enterStage(stage) {
+  currentStage = stage;
+  playTone(330, 0.08); setTimeout(()=>playTone(440,0.08),90);
+  document.getElementById('stage-scene').textContent = stage.scene;
+  document.getElementById('npc-avatar').textContent = stage.avatar;
+  document.getElementById('npc-name').textContent = stage.name;
+  document.getElementById('stage-num').textContent = stage.title;
+
+  showScreen('screen-stage');
+  typeText('dialog-text', stage.dialog, () => {
+    renderStageContent(stage);
+  });
+}
+
+// ===================== TYPEWRITER =====================
+function typeText(elId, text, callback) {
+  const el = document.getElementById(elId);
+  el.innerHTML = '';
+  let i = 0;
+  clearInterval(typingTimer);
+  typingTimer = setInterval(() => {
+    if (i < text.length) {
+      const ch = text[i];
+      el.innerHTML = text.substring(0, i+1).replace(/\n/g, '<br>') + '<span class="cursor"></span>';
+      if (ch !== ' ' && ch !== '\n' && i % 3 === 0) playTone(600 + Math.random()*200, 0.03, 'square', 0.05);
+      i++;
+    } else {
+      el.innerHTML = text.replace(/\n/g, '<br>');
+      clearInterval(typingTimer);
+      if (callback) setTimeout(callback, 300);
+    }
+  }, 40);
+}
+
+// ===================== STAGE CONTENT =====================
+function renderStageContent(stage) {
+  const container = document.getElementById('stage-content');
+  container.innerHTML = '';
+
+  if (stage.type === 'choice') {
+    renderChoices(container, stage.choices, stage);
+  } else if (stage.type === 'password') {
+    renderPassword(container, stage);
+  } else if (stage.type === 'coop-c') {
+    renderCoopC(container, stage);
+  } else if (stage.type === 'coop-a') {
+    renderCoopA(container, stage);
+  }
+}
+
+function renderChoices(container, choices, stage) {
+  const div = document.createElement('div');
+  div.className = 'dialog-choices';
+  const result = document.createElement('div');
+  result.className = 'result-msg';
+
+  choices.forEach(c => {
+    const btn = document.createElement('button');
+    btn.className = 'choice-btn';
+    btn.textContent = c.text;
+    btn.onclick = () => {
+      if (c.correct) {
+        result.textContent = stage.correctMsg;
+        result.className = 'result-msg ok';
+        soundCorrect();
+        setTimeout(() => completeStage(stage), 1200);
+      } else {
+        result.textContent = stage.wrongMsg;
+        result.className = 'result-msg fail';
+        soundWrong();
+      }
+    };
+    div.appendChild(btn);
+  });
+  container.appendChild(div);
+  container.appendChild(result);
+}
+
+function renderPassword(container, stage) {
+  const row = document.createElement('div');
+  row.className = 'input-row';
+  const input = document.createElement('input');
+  input.className = 'pixel-input';
+  input.placeholder = stage.placeholder;
+  input.type = 'text';
+  const btn = document.createElement('button');
+  btn.className = 'confirm-btn';
+  btn.textContent = 'OK';
+  const result = document.createElement('div');
+  result.className = 'result-msg';
+
+  const check = () => {
+    if (input.value.toUpperCase().trim() === stage.answer.toUpperCase()) {
+      result.textContent = stage.correctMsg;
+      result.className = 'result-msg ok';
+      soundCorrect();
+      setTimeout(() => completeStage(stage), 1200);
+    } else {
+      result.textContent = stage.wrongMsg;
+      result.className = 'result-msg fail';
+      soundWrong();
+    }
+  };
+  btn.onclick = check;
+  input.onkeydown = e => { if (e.key === 'Enter') check(); };
+
+  row.appendChild(input);
+  row.appendChild(btn);
+  container.appendChild(row);
+  container.appendChild(result);
+}
+
+function renderCoopC(container, stage) {
+  // 判斷目前是哪個 player
+  const myCode = playerNum === 1 ? stage.p1Code : playerNum === 2 ? stage.p2Code : null;
+
+  const info = document.createElement('div');
+  info.className = 'coop-info';
+
+  if (myCode !== null) {
+    info.innerHTML =
+      `⚔️ CO-OP 關卡<br>` +
+      `你是 PLAYER ${playerNum}<br>` +
+      `你的密碼片段：<br>` +
+      `<div class="coop-code">${myCode}</div>` +
+      `告訴另一位勇者你的片段，<br>合體後一起輸入！`;
+  } else {
+    info.innerHTML =
+      `⚔️ CO-OP 關卡<br>` +
+      `兩位勇者各持一半密碼<br><br>` +
+      `🔗 P1 連結：<br>` +
+      `<span style="color:var(--cyan);font-size:6px;word-break:break-all">${location.origin}${location.pathname}?p=1</span><br><br>` +
+      `🔗 P2 連結：<br>` +
+      `<span style="color:var(--pink);font-size:6px;word-break:break-all">${location.origin}${location.pathname}?p=2</span>`;
+  }
+
+  const fullAnswer = stage.p1Code + stage.p2Code;
+  const row = document.createElement('div');
+  row.className = 'input-row';
+  const input = document.createElement('input');
+  input.className = 'pixel-input';
+  input.placeholder = stage.placeholder;
+  const btn = document.createElement('button');
+  btn.className = 'confirm-btn';
+  btn.textContent = 'OK';
+  const result = document.createElement('div');
+  result.className = 'result-msg';
+
+  const check = () => {
+    if (input.value.trim() === fullAnswer) {
+      result.textContent = stage.correctMsg;
+      result.className = 'result-msg ok';
+      soundCorrect();
+      setTimeout(() => completeStage(stage), 1200);
+    } else {
+      result.textContent = stage.wrongMsg;
+      result.className = 'result-msg fail';
+      soundWrong();
+    }
+  };
+  btn.onclick = check;
+  input.onkeydown = e => { if (e.key === 'Enter') check(); };
+
+  row.appendChild(input);
+  row.appendChild(btn);
+  container.appendChild(info);
+  container.appendChild(row);
+  container.appendChild(result);
+}
+
+function renderCoopA(container, stage) {
+  // 判斷當前 player
+  let currentPlayer = playerNum || 1;
+
+  const switcher = document.createElement('div');
+  switcher.className = 'player-switch';
+
+  const p1Btn = document.createElement('button');
+  p1Btn.className = 'psw-btn' + (currentPlayer === 1 ? ' active' : '');
+  p1Btn.textContent = '▶ PLAYER 1';
+
+  const p2Btn = document.createElement('button');
+  p2Btn.className = 'psw-btn' + (currentPlayer === 2 ? ' active' : '');
+  p2Btn.textContent = '▶ PLAYER 2';
+
+  const questionArea = document.createElement('div');
+  const result = document.createElement('div');
+  result.className = 'result-msg';
+
+  // P1 已答對狀態
+  const coopState = JSON.parse(sessionStorage.getItem('coop4') || '{"p1":false,"p2":false}');
+
+  function renderPlayerQ(p) {
+    currentPlayer = p;
+    p1Btn.className = 'psw-btn' + (p === 1 ? ' active' : '');
+    p2Btn.className = 'psw-btn' + (p === 2 ? ' active' : '');
+    questionArea.innerHTML = '';
+    result.textContent = '';
+
+    const data = p === 1 ? stage.p1 : stage.p2;
+    const alreadyDone = p === 1 ? coopState.p1 : coopState.p2;
+
+    if (alreadyDone) {
+      questionArea.innerHTML = `<div class="result-msg ok" style="margin-top:10px">✅ PLAYER ${p} 已通過！</div>`;
+    } else {
+      const q = document.createElement('div');
+      q.style.cssText = 'font-size:8px;line-height:2;color:var(--cyan);margin-top:10px;margin-bottom:8px';
+      q.innerHTML = data.question.replace(/\n/g,'<br>');
+      const choices = document.createElement('div');
+      choices.className = 'dialog-choices';
+      data.choices.forEach(c => {
+        const btn = document.createElement('button');
+        btn.className = 'choice-btn';
+        btn.textContent = c.text;
+        btn.onclick = () => {
+          if (c.correct) {
+            if (p === 1) coopState.p1 = true;
+            else coopState.p2 = true;
+            sessionStorage.setItem('coop4', JSON.stringify(coopState));
+            result.textContent = stage.correctMsg;
+            result.className = 'result-msg ok';
+            soundCorrect();
+            if (coopState.p1 && coopState.p2) {
+              setTimeout(() => completeStage(stage), 1200);
+            } else {
+              setTimeout(() => renderPlayerQ(p === 1 ? 2 : 1), 1000);
+            }
+          } else {
+            result.textContent = stage.wrongMsg;
+            result.className = 'result-msg fail';
+            soundWrong();
+          }
+        };
+        choices.appendChild(btn);
+      });
+      questionArea.appendChild(q);
+      questionArea.appendChild(choices);
+    }
+    questionArea.appendChild(result);
+  }
+
+  p1Btn.onclick = () => renderPlayerQ(1);
+  p2Btn.onclick = () => renderPlayerQ(2);
+
+  switcher.appendChild(p1Btn);
+  switcher.appendChild(p2Btn);
+  container.appendChild(switcher);
+  container.appendChild(questionArea);
+
+  renderPlayerQ(currentPlayer);
+}
+
+// ===================== COMPLETE STAGE =====================
+function completeStage(stage) {
+  soundClear();
+  markComplete(stage.id);
+  showNotif('🎉 ' + stage.title + ' CLEAR!');
+
+  const allDone = stages.every(s => isCompleted(s.id));
+  if (allDone) {
+    setTimeout(() => showEnding(), 1500);
+  } else {
+    setTimeout(() => {
+      goMap();
+    }, 800);
+  }
+}
+
+function goMap() {
+  showScreen('screen-map');
+  renderMap();
+}
+
+// ===================== ENDING =====================
+function showEnding() {
+  showScreen('screen-ending');
+  startFireworks();
+  // Update names
+  document.querySelector('.ending-names').innerHTML =
+    `🌟 ${CONFIG.player1Name} & ${CONFIG.player2Name} 🌟<br>生日快樂！`;
+  // Typewriter ending message
+  const el = document.getElementById('ending-text');
+  el.innerHTML = '';
+  const fullText = CONFIG.endingMessage.join('\n');
+  let i = 0;
+  const iv = setInterval(() => {
+    if (i < fullText.length) {
+      el.innerHTML = fullText.substring(0,i+1).replace(/\n/g,'<br>');
+      i++;
+    } else {
+      clearInterval(iv);
+    }
+  }, 60);
+}
+
+// ===================== INIT =====================
+// 如果有 URL 參數 p=, 顯示提示
+if (playerNum) {
+  document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => showNotif(`🎮 PLAYER ${playerNum} MODE`), 500);
+  });
+}
+</script>
+</body>
+</html>
