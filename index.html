@@ -371,12 +371,16 @@ const STAGES = [
   {
     id: 2, scene: '🏰',
     npcAv: '🔮', npcNm: '守門魔法師',
-    type: 'password',
-    dialog: '要通過這道門，\n必須證明你的心意。\n\n對著螢幕大聲說：\n「生日快樂！」\n\n說完後輸入暗語：',
-    answer: 'HAPPY',   // ← 改暗語（自動大寫比對）
-    hint: '輸入暗語...',
-    wrong: '❌ 暗語錯誤！',
-    right: '✅ 魔法門打開了！',
+    type: 'choice',
+    dialog: '要通過這道門，\n必須回答問題！\n\n在潘朵拉的盒子中\n小夏同學看到\n某位神秘人\n跟資傳陸大學霸\n進行親密接觸...\n\n那位神秘人的姓氏為何？',
+    choices: [
+      { text: 'A. 黃', ok: true },
+      { text: 'B. 陳', ok: false },
+      { text: 'C. 鄭', ok: false },
+      { text: 'D. 蔡', ok: false },
+    ],
+    wrong: '❌ 不對！你沒在現場吧！',
+    right: '✅ 正確！目擊者認證！',
   },
   {
     id: 3, scene: '🗿',
@@ -443,7 +447,7 @@ const C1 = [
   [_,_,'T','T','T','T','T','T',_,_],
   [_,_,'L','L','L','L','L','L',_,_],
   [_,'L','L','L','L','L','L','L','L',_],
-  [_,_,_,'G','G','G','G',_,_,_],
+  [_,_,'L','L','L','L','L','L',_,_],
   [_,_,_,'G',_,_,'G',_,_,_],
   [_,_,_,'G',_,_,'G',_,_,_],
   [_,_,'F','F',_,_,'F','F',_,_],
@@ -464,7 +468,7 @@ const C2 = [
   [_,_,'t','t','t','t','t','t',_,_],
   [_,_,'l','l','l','l','l','l',_,_],
   [_,'l','l','l','l','l','l','l','l',_],
-  [_,_,_,'G','G','G','G',_,_,_],
+  [_,_,'l','l','l','l','l','l',_,_],
   [_,_,_,'G',_,_,'G',_,_,_],
   [_,_,_,'G',_,_,'G',_,_,_],
   [_,_,'f','f',_,_,'f','f',_,_],
@@ -631,7 +635,7 @@ const sndClear = () => [523,587,659,784,880].forEach((f,i)=>setTimeout(()=>tone(
 //  NOTIF
 // ═══════════════════════════════════════════
 let ntTimer;
-let _s1AnimId = null;
+let _stageAnimId = null;
 function notif(msg, isErr=false) {
   const el = document.getElementById('notif');
   el.textContent = msg;
@@ -711,7 +715,7 @@ function resetGame() {
 }
 
 function enterStage(stage) {
-  if (_s1AnimId) { cancelAnimationFrame(_s1AnimId); _s1AnimId = null; }
+  if (_stageAnimId) { cancelAnimationFrame(_stageAnimId); _stageAnimId = null; }
   const idx = STAGES.findIndex(s => s.id === stage.id);
   const done = getProgress().length;
   // Update HUD
@@ -832,7 +836,158 @@ function startStage1Anim(container) {
     }
 
     t++;
-    _s1AnimId = requestAnimationFrame(draw);
+    _stageAnimId = requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+// ═══════════════════════════════════════════
+//  STAGE 2 PIXEL ANIMATION
+// ═══════════════════════════════════════════
+function startStage2Anim(container) {
+  const PX = 5, CW = 72, CH = 26;
+  const cv = document.createElement('canvas');
+  cv.width = CW * PX; cv.height = CH * PX;
+  cv.style.cssText = 'image-rendering:pixelated;display:block;width:100%;margin-bottom:12px;border:2px solid #FF4DA6;';
+  container.appendChild(cv);
+  const ctx = cv.getContext('2d');
+  const p = (x, y, c) => {
+    if (x < 0 || x >= CW || y < 0 || y >= CH) return;
+    ctx.fillStyle = c; ctx.fillRect(x*PX, y*PX, PX, PX);
+  };
+  let t = 0;
+  const CYCLE = 160; // 一次追跑循環
+
+  function heart(x, y, c) {
+    p(x+1,y,c); p(x+3,y,c);
+    p(x,y+1,c); p(x+1,y+1,c); p(x+2,y+1,c); p(x+3,y+1,c); p(x+4,y+1,c);
+    p(x,y+2,c); p(x+1,y+2,c); p(x+2,y+2,c); p(x+3,y+2,c); p(x+4,y+2,c);
+    p(x+1,y+3,c); p(x+2,y+3,c); p(x+3,y+3,c);
+    p(x+2,y+4,c);
+  }
+  function kiss(x, y, c) {
+    p(x,y,c); p(x+2,y,c); p(x+1,y+1,c); p(x,y+2,c); p(x+2,y+2,c);
+  }
+
+  // 胖女生（紅髮、紫衣、不同於主角）
+  function fatGirl(ox, oy) {
+    const run = Math.floor(t/6)%2;
+    const x = ox, y = oy;
+    // 頭髮 (紅色 蓬鬆)
+    p(x,y,'#c0392b'); p(x+1,y,'#c0392b'); p(x+2,y,'#c0392b'); p(x+3,y,'#c0392b'); p(x+4,y,'#c0392b'); p(x+5,y,'#c0392b');
+    p(x-1,y+1,'#c0392b'); p(x+6,y+1,'#c0392b');
+    // 臉 (寬圓臉)
+    p(x,y+1,'#FFDAB9'); p(x+1,y+1,'#FFDAB9'); p(x+2,y+1,'#FFDAB9'); p(x+3,y+1,'#FFDAB9'); p(x+4,y+1,'#FFDAB9'); p(x+5,y+1,'#FFDAB9');
+    p(x,y+2,'#FFDAB9'); p(x+1,y+2,'#FFDAB9'); p(x+2,y+2,'#FFDAB9'); p(x+3,y+2,'#FFDAB9'); p(x+4,y+2,'#FFDAB9'); p(x+5,y+2,'#FFDAB9');
+    // 心心眼
+    p(x+1,y+2,'#FF4DA6'); p(x+4,y+2,'#FF4DA6');
+    // 嘟嘴
+    p(x+2,y+3,'#cc0000'); p(x+3,y+3,'#cc0000');
+    // 腮紅
+    p(x,y+2,'#FFB3BA'); p(x+5,y+2,'#FFB3BA');
+    // 胖身體（紫色）
+    for (let dy=0; dy<=3; dy++) {
+      const w = dy<=1 ? 8 : 9;
+      for (let dx=0; dx<w; dx++) p(x-1+dx, y+4+dy, '#7b2d8b');
+    }
+    // 裙 (寬裙)
+    for (let dx=-2; dx<=8; dx++) p(x+dx, y+8, '#9b59b6');
+    for (let dx=-3; dx<=9; dx++) p(x+dx, y+9, '#9b59b6');
+    for (let dx=-2; dx<=8; dx++) p(x+dx, y+10, '#9b59b6');
+    // 腿 (跑步擺動)
+    if (run === 0) {
+      p(x,y+11,'#FFDAB9'); p(x+1,y+11,'#FFDAB9'); p(x+4,y+12,'#FFDAB9'); p(x+5,y+12,'#FFDAB9');
+      p(x-1,y+12,'#555'); p(x,y+12,'#555'); p(x+5,y+13,'#555'); p(x+6,y+13,'#555');
+    } else {
+      p(x+4,y+11,'#FFDAB9'); p(x+5,y+11,'#FFDAB9'); p(x,y+12,'#FFDAB9'); p(x+1,y+12,'#FFDAB9');
+      p(x+5,y+12,'#555'); p(x+6,y+12,'#555'); p(x-1,y+13,'#555'); p(x,y+13,'#555');
+    }
+  }
+
+  // 男生（跑步逃跑）
+  function runningGuy(ox, oy) {
+    const run = Math.floor(t/6)%2;
+    const x = ox, y = oy;
+    // 頭 (回頭看)
+    p(x,y,'#2C1810'); p(x+1,y,'#2C1810'); p(x+2,y,'#2C1810'); p(x+3,y,'#2C1810');
+    p(x,y+1,'#FFDAB9'); p(x+1,y+1,'#FFDAB9'); p(x+2,y+1,'#FFDAB9'); p(x+3,y+1,'#FFDAB9');
+    // 驚恐眼 (向左看)
+    p(x,y+1,'#2C1810'); p(x+1,y+2,'#2C1810'); p(x+3,y+2,'#FFDAB9');
+    // 汗水
+    if (Math.floor(t/5)%2===0) p(x+4,y,'#00e5ff');
+    // 身體前傾
+    p(x+1,y+3,'#444'); p(x+2,y+3,'#444'); p(x+3,y+3,'#444');
+    p(x,y+4,'#444'); p(x+1,y+4,'#444'); p(x+2,y+4,'#444');
+    p(x,y+5,'#444'); p(x+1,y+5,'#444');
+    // 手臂前後擺
+    if (run === 0) {
+      p(x+3,y+3,'#FFDAB9'); p(x+4,y+3,'#FFDAB9'); // 前手
+      p(x-1,y+5,'#FFDAB9');                         // 後手
+    } else {
+      p(x+3,y+5,'#FFDAB9'); p(x+4,y+5,'#FFDAB9');
+      p(x-1,y+3,'#FFDAB9');
+    }
+    // 腿跑步
+    if (run === 0) {
+      p(x,y+6,'#333'); p(x+1,y+7,'#333');
+      p(x+2,y+6,'#333'); p(x+2,y+5,'#333');
+      p(x,y+8,'#555'); p(x+1,y+8,'#555');
+    } else {
+      p(x+2,y+6,'#333'); p(x+1,y+7,'#333');
+      p(x,y+6,'#333'); p(x,y+5,'#333');
+      p(x+2,y+8,'#555'); p(x+3,y+8,'#555');
+    }
+  }
+
+  function draw() {
+    ctx.fillStyle = '#0a0a1a'; ctx.fillRect(0, 0, cv.width, cv.height);
+    for (let x = 0; x < CW; x++) { p(x,CH-2,'#1a1a1a'); p(x,CH-1,'#222'); }
+
+    const phase = t % CYCLE;
+    const caught = phase > 110; // 追到了
+
+    // 胖女生位置：從左追
+    const girlX = Math.min(Math.floor(phase * 0.45), 40);
+    // 男生位置：往右逃
+    const guyX  = caught ? girlX + 8 : Math.min(6 + Math.floor(phase * 0.35), 50);
+    const baseY = CH - 15;
+
+    fatGirl(girlX, baseY);
+    runningGuy(guyX, baseY + 1);
+
+    if (caught) {
+      // 親嘴
+      if (Math.floor(t/6)%2===0) {
+        kiss(guyX - 3, baseY, '#FF4DA6');
+      } else {
+        heart(guyX - 4, baseY - 1, '#FF4DA6');
+      }
+      // 問號/驚嘆
+      if (Math.floor(t/8)%2===0) {
+        p(guyX+5,baseY-2,'#ffe600'); p(guyX+5,baseY-1,'#ffe600'); p(guyX+5,baseY+1,'#ffe600');
+      }
+    }
+
+    // 飛心（追跑時）
+    if (!caught) {
+      [{x:girlX+2,y:baseY-2,c:'#FF4DA6',sp:8},{x:girlX,y:baseY-4,c:'#FF69B4',sp:10}]
+      .forEach(({x,y,c,sp},i) => {
+        const off = Math.floor((t+i*15)/sp)%7;
+        if (off<5) heart(x, y-off, c);
+      });
+    }
+
+    // 速度線（追跑時）
+    if (!caught) {
+      const lineY = baseY + 5;
+      for (let i=0; i<4; i++) {
+        const lx = ((girlX - i*6 - Math.floor(t/2)%6 + 72) % 72);
+        p(lx, lineY+i*2, '#333'); p(lx+1, lineY+i*2, '#333'); p(lx+2, lineY+i*2, '#333');
+      }
+    }
+
+    t++;
+    _stageAnimId = requestAnimationFrame(draw);
   }
   draw();
 }
@@ -860,6 +1015,9 @@ function renderChoice(box, stage) {
         if (stage.id === 1) {
           setTimeout(() => startStage1Anim(box), 400);
           setTimeout(() => completeStage(stage), 4000);
+        } else if (stage.id === 2) {
+          setTimeout(() => startStage2Anim(box), 400);
+          setTimeout(() => completeStage(stage), 4500);
         } else {
           setTimeout(() => completeStage(stage), 1200);
         }
