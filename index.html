@@ -12,18 +12,20 @@
   font-display: swap;
 }
 </style>
-<link href="https://unpkg.com/nes.css@2.3.0/css/nes.min.css" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-html, body {
+html {
+  overflow: hidden;
+  height: 100%;
+}
+body {
   background: #0a0a1a;
   color: #e8e8e8;
   font-family: 'Press Start 2P', 'Jf Open Huninn', cursive;
   font-size: 10px;
   width: 100%; height: 100%;
   overflow: hidden;
-  position: fixed;
 }
 
 /* STARFIELD */
@@ -58,7 +60,43 @@ html, body {
 }
 .hud-stage { font-size: 11px; color: #ffe600; }
 .hud-stars { font-size: 11px; letter-spacing: 2px; }
-progress.nes-progress { height: 14px !important; width: 100% !important; }
+/* custom pixel progress bar */
+.px-progress {
+  width: 100%; height: 14px;
+  border: 2px solid #00ff41;
+  background: #0a0a1a;
+  display: block;
+  padding: 2px;
+}
+.px-progress-inner {
+  height: 100%;
+  background: #00ff41;
+  transition: width 0.5s;
+  width: 0%;
+}
+/* custom pixel button */
+.px-btn-main {
+  font-family: 'Press Start 2P', 'Jf Open Huninn', cursive;
+  font-size: 10px; padding: 12px 20px;
+  border: 3px solid #00ff41; background: #0a0a1a; color: #00ff41;
+  cursor: pointer; width: 100%; letter-spacing: 1px;
+  box-shadow: 3px 3px 0 #00ff41;
+}
+.px-btn-main:active { transform: translate(3px,3px); box-shadow: none; }
+.px-btn-sub {
+  font-family: 'Press Start 2P', 'Jf Open Huninn', cursive;
+  font-size: 9px; padding: 10px 16px;
+  border: 3px solid #888; background: #0a0a1a; color: #888;
+  cursor: pointer; width: 100%; letter-spacing: 1px;
+  box-shadow: 3px 3px 0 #888;
+}
+.px-btn-sub:active { transform: translate(3px,3px); box-shadow: none; }
+/* pixel container box */
+.px-container {
+  border: 3px solid #e8e8e8;
+  background: #0f0f2e;
+  box-shadow: 4px 4px 0 #444;
+}
 
 /* TITLE SCREEN */
 #screen-title {
@@ -87,7 +125,6 @@ progress.nes-progress { height: 14px !important; width: 100% !important; }
   display: flex; flex-direction: column; gap: 10px;
   align-items: center; width: 100%; max-width: 360px;
 }
-.nes-btn { font-size: 10px !important; }
 
 /* STAGE SCREEN */
 #screen-stage {
@@ -140,11 +177,17 @@ progress.nes-progress { height: 14px !important; width: 100% !important; }
 /* INPUT */
 .input-area { margin-top: 12px; display: flex; flex-direction: column; gap: 8px; }
 .px-input {
-  width: 100%; border: 3px solid #00e5ff; background: #0f0f2e;
-  color: #00e5ff; font-family: 'Press Start 2P', 'Jf Open Huninn', cursive;
-  font-size: 12px; padding: 12px 10px; outline: none; letter-spacing: 3px;
+  width: 100%; border: 3px solid #00e5ff !important; background: #0f0f2e !important;
+  color: #00e5ff !important; font-family: 'Press Start 2P', 'Jf Open Huninn', cursive !important;
+  font-size: 16px !important; padding: 12px 10px; outline: none; letter-spacing: 3px;
+  pointer-events: auto !important;
+  user-select: text !important;
+  -webkit-user-select: text !important;
+  cursor: text !important;
+  -webkit-appearance: none;
+  border-radius: 0;
 }
-.px-input::placeholder { color: #333; }
+.px-input::placeholder { color: #555; }
 .px-btn {
   width: 100%; border: 3px solid #ffe600; background: #0a0a1a;
   color: #ffe600; font-family: 'Press Start 2P', 'Jf Open Huninn', cursive;
@@ -213,7 +256,6 @@ progress.nes-progress { height: 14px !important; width: 100% !important; }
 @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
 
 /* NES overrides */
-.nes-container { background: #0f0f2e !important; }
 </style>
 </head>
 <body>
@@ -228,21 +270,21 @@ progress.nes-progress { height: 14px !important; width: 100% !important; }
     <span class="hud-stage" id="hud-stage">STAGE 1 / 5</span>
     <span class="hud-stars" id="hud-stars">☆☆☆☆☆</span>
   </div>
-  <progress class="nes-progress is-success" id="hud-bar" value="0" max="100"></progress>
+  <div class="px-progress"><div class="px-progress-inner" id="hud-bar"></div></div>
 </div>
 
 <!-- TITLE -->
 <div class="screen active" id="screen-title">
   <div class="title-chars" id="title-chars"></div>
-  <div class="title-box nes-container">
+  <div class="title-box px-container">
     <div class="title-main">🎂<br>BIRTHDAY<br>QUEST</div>
     <div class="title-sub">── LV.27 × LV.27 ──</div>
     <div class="title-names" id="title-names">✨ 壽星甲 &amp; 壽星乙 ✨</div>
     <div class="blink" style="font-size:8px;color:#00ff41">▶ PRESS START ◀</div>
   </div>
   <div class="start-area">
-    <button class="nes-btn is-success" id="start-btn" onclick="startGame()" style="width:100%">▶ START GAME</button>
-    <button class="nes-btn" onclick="resetGame()" style="width:100%;font-size:8px">↺ NEW GAME</button>
+    <button class="px-btn-main" id="start-btn" onclick="startGame()">▶ START GAME</button>
+    <button class="px-btn-sub" onclick="resetGame()">↺ NEW GAME</button>
     <div style="font-size:7px;color:#444;text-align:center;line-height:2">CO-OP: SHARE ?p=1 OR ?p=2</div>
   </div>
 </div>
@@ -284,7 +326,7 @@ progress.nes-progress { height: 14px !important; width: 100% !important; }
   <div style="font-size:7px;color:#444;line-height:2;padding:8px;text-align:center">
     ♥ LV.27 BIRTHDAY QUEST ♥
   </div>
-  <button class="nes-btn" onclick="resetGame()" style="margin-bottom:20px;font-size:8px">↺ PLAY AGAIN</button>
+  <button class="px-btn-sub" onclick="resetGame()" style="max-width:280px;margin-bottom:20px">↺ PLAY AGAIN</button>
 </div>
 
 <script>
@@ -292,8 +334,8 @@ progress.nes-progress { height: 14px !important; width: 100% !important; }
 //  CONFIG — 修改這裡！
 // ═══════════════════════════════════════════
 const CFG = {
-  p1Name: '壽星甲',   // ← 棕髮活潑
-  p2Name: '壽星乙',   // ← 黑髮乖乖
+  p1Name: '夏郁婷',   // ← 棕髮活潑
+  p2Name: '羅紫芳',   // ← 黑髮乖乖
   ending: [
     '恭喜你們解開了',
     '所有的謎題！',
@@ -316,15 +358,15 @@ const STAGES = [
     id: 1, scene: '⚔️',
     npcAv: '🧙', npcNm: '神秘勇者',
     type: 'choice',
-    dialog: '勇者！\n歡迎來到生日迷宮！\n\n第一關：靈魂拷問\n\n他們27歲\n最想做的事是？',
+    dialog: '勇者！\n歡迎來到生日迷宮！\n\n第一關：靈魂拷問\n\n羅笨曾經走在路上\n遇到什麼動物，\n嚇到哭著打電話求救？',
     choices: [
-      { text: '環遊世界', ok: false },
-      { text: '贏得樂透', ok: false },
-      { text: '好好睡一覺', ok: true },  // ← 改正確答案
-      { text: '買新手遊', ok: false },
+      { text: '蟑螂', ok: false },
+      { text: '青蛙', ok: true },
+      { text: '蛞蝓', ok: false },
+      { text: '鴿子', ok: false },
     ],
-    wrong: '❌ 不對！再想想...',
-    right: '✅ 正確！你真的了解他們！',
+    wrong: '❌ 不對！羅笨：「你根本不了解我的恐懼！」',
+    right: '✅ 正確！就是青蛙！羅笨至今仍有陰影...',
   },
   {
     id: 2, scene: '🏰',
@@ -429,14 +471,22 @@ const C2 = [
 ];
 
 const PCOLORS = {
-  'H': '#8B5E3C', 'h': '#1A1A2E',
-  'S': '#FFDAB9', 'E': '#2C1810',
-  'X': '#FF9999', 'x': '#FFB7C5',
-  'T': '#FF8C00', 't': '#FFB7C5',
-  'K': '#FFD700', 'W': '#FFFFFF',
-  'L': '#FF69B4', 'l': '#B39DDB',
-  'F': '#5C3317', 'f': '#9C89B8',
-  'G': '#FFDAB9',
+  // 共用
+  'S': '#FFDAB9', 'E': '#2C1810', 'G': '#FFDAB9',
+  // 甲 (夏郁婷) — 橘 / 黃 / 粉紅
+  'H': '#FF7C20',  // 橘色頭髮
+  'X': '#FFB3BA',  // 粉紅腮紅
+  'T': '#FF8C00',  // 橘色上衣
+  'K': '#FFD700',  // 黃色點綴
+  'L': '#FF4DA6',  // 粉紅裙
+  'F': '#CC4400',  // 深橘鞋
+  // 乙 (羅紫芳) — 藍 / 綠
+  'h': '#1A237E',  // 深藍頭髮
+  'x': '#B3E5FC',  // 淺藍腮紅
+  't': '#2196F3',  // 藍色上衣
+  'W': '#FFFFFF',  // 白色點綴
+  'l': '#43A047',  // 綠色裙
+  'f': '#0D47A1',  // 深藍鞋
 };
 
 function drawChar(data, canvas, scale) {
@@ -581,6 +631,7 @@ const sndClear = () => [523,587,659,784,880].forEach((f,i)=>setTimeout(()=>tone(
 //  NOTIF
 // ═══════════════════════════════════════════
 let ntTimer;
+let _s1AnimId = null;
 function notif(msg, isErr=false) {
   const el = document.getElementById('notif');
   el.textContent = msg;
@@ -660,11 +711,12 @@ function resetGame() {
 }
 
 function enterStage(stage) {
+  if (_s1AnimId) { cancelAnimationFrame(_s1AnimId); _s1AnimId = null; }
   const idx = STAGES.findIndex(s => s.id === stage.id);
   const done = getProgress().length;
   // Update HUD
   document.getElementById('hud-stage').textContent = `STAGE ${idx+1} / 5`;
-  document.getElementById('hud-bar').value = (done / STAGES.length) * 100;
+  document.getElementById('hud-bar').style.width = (done / STAGES.length * 100) + '%';
   document.getElementById('hud-stars').textContent = '⭐'.repeat(done) + '☆'.repeat(5-done);
   // Update dialog header
   document.getElementById('npc-av').textContent = stage.npcAv;
@@ -682,7 +734,7 @@ function completeStage(stage) {
   sndClear();
   markDone(stage.id);
   const done = getProgress().length;
-  document.getElementById('hud-bar').value = (done / STAGES.length) * 100;
+  document.getElementById('hud-bar').style.width = (done / STAGES.length * 100) + '%';
   document.getElementById('hud-stars').textContent = '⭐'.repeat(done) + '☆'.repeat(5-done);
   const idx = STAGES.findIndex(s => s.id === stage.id);
   const next = STAGES[idx + 1];
@@ -693,6 +745,96 @@ function completeStage(stage) {
     notif(`🎉 STAGE ${idx+1} CLEAR!`);
     setTimeout(() => enterStage(next), 1800);
   }
+}
+
+// ═══════════════════════════════════════════
+//  STAGE 1 PIXEL ANIMATION
+// ═══════════════════════════════════════════
+function startStage1Anim(container) {
+  const PX = 5, CW = 72, CH = 22;
+  const cv = document.createElement('canvas');
+  cv.width = CW * PX; cv.height = CH * PX;
+  cv.style.cssText = 'image-rendering:pixelated;display:block;width:100%;margin-bottom:12px;border:2px solid #222;';
+  container.appendChild(cv);
+  const ctx = cv.getContext('2d');
+  const p = (x, y, c) => {
+    if (x < 0 || x >= CW || y < 0 || y >= CH) return;
+    ctx.fillStyle = c; ctx.fillRect(x*PX, y*PX, PX, PX);
+  };
+  let t = 0;
+  const CYCLE = 140;
+  const STARS = [[5,2],[12,4],[20,1],[35,3],[50,2],[65,4],[25,5]];
+
+  function draw() {
+    ctx.fillStyle = '#0a0a1a'; ctx.fillRect(0, 0, cv.width, cv.height);
+
+    // 閃爍星星
+    STARS.forEach(([sx, sy]) => p(sx, sy, Math.floor(t/15)%2===0 ? '#aaa' : '#555'));
+
+    // 地板
+    for (let x = 0; x < CW; x++) {
+      p(x, CH-3, '#1a1a1a'); p(x, CH-2, '#242424'); p(x, CH-1, '#2e2e2e');
+    }
+    // 路面虛線
+    const dash = Math.floor(t/4) % 8;
+    for (let x = -dash; x < CW; x += 8) { p(x+3, CH-2, '#555'); p(x+4, CH-2, '#555'); }
+
+    // --- 青蛙 ---
+    const frogX = Math.floor((t % CYCLE) * (CW / CYCLE));
+    const hop   = Math.floor(t/8) % 2 === 0 ? 0 : -2;
+    const fy    = CH - 3 - 4 + hop;
+    [
+      [frogX+1,fy,  '#81C784'],[frogX+2,fy,  '#81C784'],
+      [frogX,  fy+1,'#4CAF50'],[frogX+1,fy+1,'#4CAF50'],[frogX+2,fy+1,'#4CAF50'],[frogX+3,fy+1,'#4CAF50'],
+      [frogX,  fy+2,'#4CAF50'],[frogX+1,fy+2,'#1a1a1a'],[frogX+2,fy+2,'#4CAF50'],[frogX+3,fy+2,'#1a1a1a'],
+      [frogX,  fy+3,'#388E3C'],[frogX+3,fy+3,'#388E3C'],
+    ].forEach(([x,y,c]) => p(x,y,c));
+
+    // --- 羅笨 ---
+    const close = frogX > CW - 20;
+    const sk    = close && Math.floor(t/3)%2===0 ? 1 : 0;
+    const ppx   = CW - 11 + sk;
+    const ppy   = CH - 3 - 9;
+    // 頭髮深藍
+    p(ppx,  ppy,  '#1A237E'); p(ppx+1,ppy,  '#1A237E'); p(ppx+2,ppy,  '#1A237E');
+    p(ppx-1,ppy+1,'#1A237E'); p(ppx+3,ppy+1,'#1A237E');
+    // 臉
+    p(ppx,  ppy+1,'#FFDAB9'); p(ppx+1,ppy+1,'#FFDAB9'); p(ppx+2,ppy+1,'#FFDAB9');
+    // 眼睛 / 嘴巴
+    p(ppx,  ppy+2,'#2C1810'); p(ppx+2,ppy+2,'#2C1810');
+    p(ppx+1,ppy+2, close ? '#cc0000' : '#FFDAB9');
+    // 身體藍
+    p(ppx,  ppy+3,'#2196F3'); p(ppx+1,ppy+3,'#2196F3'); p(ppx+2,ppy+3,'#2196F3');
+    p(ppx,  ppy+4,'#2196F3'); p(ppx+1,ppy+4,'#2196F3'); p(ppx+2,ppy+4,'#2196F3');
+    // 裙子綠
+    p(ppx-1,ppy+5,'#43A047'); p(ppx,  ppy+5,'#43A047'); p(ppx+1,ppy+5,'#43A047');
+    p(ppx+2,ppy+5,'#43A047'); p(ppx+3,ppy+5,'#43A047');
+    // 腿
+    p(ppx,  ppy+6,'#FFDAB9'); p(ppx+2,ppy+6,'#FFDAB9');
+
+    if (close) {
+      // 手臂舉起
+      p(ppx+3,ppy+3,'#FFDAB9'); p(ppx+4,ppy+2,'#FFDAB9');
+      // 手機
+      p(ppx+5,ppy+1,'#222'); p(ppx+6,ppy+1,'#222');
+      p(ppx+5,ppy+2,'#555'); p(ppx+6,ppy+2,'#4FC3F7');
+      p(ppx+5,ppy+3,'#555'); p(ppx+6,ppy+3,'#555');
+      p(ppx+5,ppy+4,'#222'); p(ppx+6,ppy+4,'#222');
+      // 訊號波
+      if (Math.floor(t/4)%2===0) {
+        p(ppx+7,ppy+1,'#FFD700'); p(ppx+8,ppy,  '#FFD700'); p(ppx+9,ppy-1,'#FFD700');
+      }
+      // !! 驚嚇
+      if (Math.floor(t/5)%2===0) {
+        p(ppx-3,ppy-1,'#FF4DA6'); p(ppx-3,ppy,  '#FF4DA6'); p(ppx-3,ppy+2,'#FF4DA6');
+        p(ppx-2,ppy-1,'#FF4DA6'); p(ppx-2,ppy,  '#FF4DA6'); p(ppx-2,ppy+2,'#FF4DA6');
+      }
+    }
+
+    t++;
+    _s1AnimId = requestAnimationFrame(draw);
+  }
+  draw();
 }
 
 // ═══════════════════════════════════════════
@@ -713,7 +855,15 @@ function renderChoice(box, stage) {
     const btn = document.createElement('button'); btn.className = 'c-btn';
     btn.textContent = c.text;
     btn.onclick = () => {
-      if (c.ok) { res.className='result ok'; res.textContent=stage.right; sndOk(); setTimeout(()=>completeStage(stage),1200); }
+      if (c.ok) {
+        res.className='result ok'; res.textContent=stage.right; sndOk();
+        if (stage.id === 1) {
+          setTimeout(() => startStage1Anim(box), 400);
+          setTimeout(() => completeStage(stage), 4000);
+        } else {
+          setTimeout(() => completeStage(stage), 1200);
+        }
+      }
       else { res.className='result fail'; res.textContent=stage.wrong; sndErr(); }
     };
     div.appendChild(btn);
@@ -723,7 +873,14 @@ function renderChoice(box, stage) {
 
 function renderPW(box, stage) {
   const area = document.createElement('div'); area.className = 'input-area';
-  const inp = Object.assign(document.createElement('input'), { className:'px-input', placeholder:stage.hint });
+  const inp = document.createElement('input');
+  inp.type = 'text';
+  inp.className = 'px-input';
+  inp.placeholder = stage.hint;
+  inp.autocomplete = 'off';
+  inp.autocorrect = 'off';
+  inp.autocapitalize = 'off';
+  inp.spellcheck = false;
   const btn = document.createElement('button'); btn.className = 'px-btn'; btn.textContent = '▶ CONFIRM';
   const res = mkResult();
   const check = () => {
@@ -736,6 +893,8 @@ function renderPW(box, stage) {
   btn.onclick = check; inp.onkeydown = e => e.key==='Enter' && check();
   area.appendChild(inp); area.appendChild(btn);
   box.appendChild(area); box.appendChild(res);
+  setTimeout(() => inp.focus(), 100);
+  box.addEventListener('click', () => inp.focus());
 }
 
 function renderCoopC(box, stage) {
@@ -749,7 +908,9 @@ function renderCoopC(box, stage) {
     cbox.innerHTML = `⚔️ CO-OP 關卡<br>分享連結給兩位勇者：<br><br>P1:<br><span class="coop-url">${location.origin}${location.pathname}?p=1</span><br><br>P2:<br><span class="coop-url">${location.origin}${location.pathname}?p=2</span>`;
   }
   const area = document.createElement('div'); area.className = 'input-area';
-  const inp = Object.assign(document.createElement('input'), { className:'px-input', placeholder:stage.hint });
+  const inp = document.createElement('input');
+  inp.type = 'text'; inp.className = 'px-input'; inp.placeholder = stage.hint;
+  inp.autocomplete = 'off'; inp.autocorrect = 'off'; inp.autocapitalize = 'off'; inp.spellcheck = false;
   const btn = document.createElement('button'); btn.className='px-btn'; btn.textContent='▶ CONFIRM';
   const res = mkResult();
   const check = () => {
