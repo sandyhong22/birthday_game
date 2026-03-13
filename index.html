@@ -156,7 +156,13 @@ body {
 .npc-av { font-size: 26px; }
 .npc-nm { font-size: 13px; color: #ffe600; }
 .npc-tp { font-size: 9px; color: #555; margin-left: auto; }
-.dialog-text { font-size: 13px; line-height: 2.2; color: #e8e8e8; min-height: 56px; }
+.dialog-text {
+  font-size: 13px; line-height: 2.2; color: #e8e8e8;
+  min-height: 56px; max-height: 38vh; overflow-y: auto;
+  outline: none; user-select: none; -webkit-user-select: none;
+}
+.dialog-text::-webkit-scrollbar { width: 4px; }
+.dialog-text::-webkit-scrollbar-thumb { background: #444; border-radius: 2px; }
 .cursor {
   display: inline-block; width: 8px; height: 13px;
   background: #e8e8e8; vertical-align: middle;
@@ -377,53 +383,37 @@ const STAGES = [
       { text: 'A. 黃', ok: true },
       { text: 'B. 陳', ok: false },
       { text: 'C. 鄭', ok: false },
-      { text: 'D. 蔡', ok: false },
+      { text: 'D. 林', ok: false },
     ],
     wrong: '❌ 不對！你沒在現場吧！',
     right: '✅ 正確！目擊者認證！',
   },
   {
-    id: 3, scene: '🗿',
+    id: 3, scene: '🌲',
     npcAv: '📜', npcNm: '古老石板',
-    type: 'coop-c',
-    dialog: '這道謎題需要\n兩位勇者合力！\n\nP1 和 P2\n各持一半密碼...\n\n找到對方，合體輸入！',
-    p1code: '27-',    // ← P1 看到的一半
-    p2code: '2025',   // ← P2 看到的一半（合體 = 27-2025）
-    hint: '輸入完整密碼...',
-    wrong: '❌ 密碼不對！再確認！',
-    right: '✅ 封印解除！雙人力量萬歲！',
-  },
-  {
-    id: 4, scene: '🌋',
-    npcAv: '⚡', npcNm: '試煉祭壇',
-    type: 'coop-a',
-    dialog: '最終考驗！\n兩位勇者必須\n各自通過考題！\n\n選擇你的角色：',
-    p1q: '關於壽星乙：\n她最怕什麼？',
-    p1choices: [
-      { text: '蟑螂', ok: true },    // ← 改正確答案
-      { text: '黑暗', ok: false },
-      { text: '高空', ok: false },
-      { text: '考試', ok: false },
-    ],
-    p2q: '關於壽星甲：\n她的絕招是？',
-    p2choices: [
-      { text: '睡覺治百病', ok: false },
-      { text: '一秒找到吃的', ok: true }, // ← 改正確答案
-      { text: '電影百科全書', ok: false },
-      { text: '永遠不遲到', ok: false },
-    ],
-    wrong: '❌ 答錯了！再試！',
-    right: '✅ 通過！你真的很了解對方！',
-  },
-  {
-    id: 5, scene: '🐉',
-    npcAv: '👑', npcNm: '終極 BOSS',
     type: 'password',
-    dialog: '抵達最終關卡！\n\nBOSS 問：\n兩位壽星\n合起來幾歲？\n\n輸入數字密碼：',
-    answer: '54',     // ← 27+27=54
-    hint: '輸入數字...',
-    wrong: '❌ BOSS 大笑：「算術不好！」',
-    right: '✅ BOSS 被打敗了！！！',
+    dialog: '石板上刻著一段神秘文字\n──────────────\n踏入古老的森林後，\n發現路旁刻著奇怪的符號\n\n兩隻貓靜靜坐在石頭上，\n像是在守護著什麼\n\n沿著小徑抵達第七棵樹時，\n地上有一枚銅幣散發微光\n\n穿過溪流，水面映出字樣：\n「歲華如歌，光陰不待人」\n\n再往前走，橋下溪水流淌，\n映照著生機盎然\n\n古老的石門上刻著\n『日影流轉，\n踏過此門者方得真寶』\n\n跨過石門爬上山丘，\n感受風的輕拂，\n願你們煩惱隨雲霧快速散去，\n祝你未來的每一刻\n都活得怡然自樂\n──────────────\n致勇者：\n線索已埋藏在古老的傳說中。\n唯有尋獲暗語者，\n才能進入最後一關！\n\n輸入暗語：',
+    answer: '27歲生日快樂',
+    hint: '輸入暗語...',
+    wrong: '❌ 暗語錯誤！線索就在文字中...',
+    right: '✅ 封印解除！古老石門緩緩開啟！',
+  },
+  {
+    id: 4, scene: '🎁',
+    npcAv: '✉️', npcNm: '神秘信使',
+    type: 'password',
+    dialog: '親愛的勇者阿\n\n想要禮物嗎？\n想要的話，\n就靠自己的力量來拿吧！\n\n我們已經把線索\n散落在各個角落，\n等著你們一一發現。\n\n只要集齊所有線索，\n拼湊出最後的答案——\n\n禮物，就會屬於你們。\n\n祝你們好運\n\n輸入寶藏所在地：',
+    answer: '待定',
+    hint: '輸入答案...',
+    wrong: '❌ 還沒找到！繼續尋寶！',
+    right: '✅ 找到了！寶藏就在那裡！',
+  },
+  {
+    id: 5, scene: '🗺️',
+    npcAv: '🧭', npcNm: '冒險地圖',
+    type: 'button',
+    dialog: '所有線索\n都已就位。\n\n寶藏，\n正在等待你們。\n\n勇者啊——\n\n準備好了嗎？',
+    btnText: '出發吧勇者',
   },
 ];
 
@@ -690,7 +680,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Check saved progress
   const done = getProgress().length;
   if (done > 0) {
-    document.getElementById('start-btn').textContent = `▶ CONTINUE (${done}/5)`;
+    document.getElementById('start-btn').textContent = `▶ CONTINUE (${done}/${STAGES.length})`;
   }
   if (PLAYER) notif(`🎮 PLAYER ${PLAYER} MODE`);
 });
@@ -719,9 +709,9 @@ function enterStage(stage) {
   const idx = STAGES.findIndex(s => s.id === stage.id);
   const done = getProgress().length;
   // Update HUD
-  document.getElementById('hud-stage').textContent = `STAGE ${idx+1} / 5`;
+  document.getElementById('hud-stage').textContent = `STAGE ${idx+1} / ${STAGES.length}`;
   document.getElementById('hud-bar').style.width = (done / STAGES.length * 100) + '%';
-  document.getElementById('hud-stars').textContent = '⭐'.repeat(done) + '☆'.repeat(5-done);
+  document.getElementById('hud-stars').textContent = '⭐'.repeat(done) + '☆'.repeat(STAGES.length-done);
   // Update dialog header
   document.getElementById('npc-av').textContent = stage.npcAv;
   document.getElementById('npc-nm').textContent = stage.npcNm;
@@ -731,6 +721,11 @@ function enterStage(stage) {
   // Draw chars
   initChars(6, null, false);
   showScreen('screen-stage');
+  if (stage.id === 3) {
+    const emojiEl = document.getElementById('scene-emoji');
+    emojiEl.textContent = '';
+    startStage3Scene(emojiEl);
+  }
   typeText('dialog-text', stage.dialog, () => renderContent(stage));
 }
 
@@ -739,7 +734,7 @@ function completeStage(stage) {
   markDone(stage.id);
   const done = getProgress().length;
   document.getElementById('hud-bar').style.width = (done / STAGES.length * 100) + '%';
-  document.getElementById('hud-stars').textContent = '⭐'.repeat(done) + '☆'.repeat(5-done);
+  document.getElementById('hud-stars').textContent = '⭐'.repeat(done) + '☆'.repeat(STAGES.length-done);
   const idx = STAGES.findIndex(s => s.id === stage.id);
   const next = STAGES[idx + 1];
   if (!next) {
@@ -848,7 +843,7 @@ function startStage2Anim(container) {
   const PX = 5, CW = 72, CH = 26;
   const cv = document.createElement('canvas');
   cv.width = CW * PX; cv.height = CH * PX;
-  cv.style.cssText = 'image-rendering:pixelated;display:block;width:100%;margin-bottom:12px;border:2px solid #FF4DA6;';
+  cv.style.cssText = 'image-rendering:pixelated;display:block;width:100%;margin-bottom:12px;border:2px solid #FFD700;';
   container.appendChild(cv);
   const ctx = cv.getContext('2d');
   const p = (x, y, c) => {
@@ -856,7 +851,7 @@ function startStage2Anim(container) {
     ctx.fillStyle = c; ctx.fillRect(x*PX, y*PX, PX, PX);
   };
   let t = 0;
-  const CYCLE = 160; // 一次追跑循環
+  const CYCLE = 180;
 
   function heart(x, y, c) {
     p(x+1,y,c); p(x+3,y,c);
@@ -865,126 +860,245 @@ function startStage2Anim(container) {
     p(x+1,y+3,c); p(x+2,y+3,c); p(x+3,y+3,c);
     p(x+2,y+4,c);
   }
-  function kiss(x, y, c) {
-    p(x,y,c); p(x+2,y,c); p(x+1,y+1,c); p(x,y+2,c); p(x+2,y+2,c);
+
+  // 王子橫躺（頭在 px,py，身體向右延伸）
+  function sleepingPrince(px, py, sleeping) {
+    p(px+1,py-2,'#FFD700'); p(px+2,py-2,'#FFD700'); p(px+3,py-2,'#FFD700');
+    p(px,  py-1,'#FFD700'); p(px+2,py-1,'#FFD700'); p(px+4,py-1,'#FFD700');
+    p(px,py,  '#2C1810'); p(px+1,py,  '#2C1810'); p(px+2,py,  '#2C1810'); p(px+3,py,  '#2C1810');
+    p(px,py+1,'#FFDAB9'); p(px+1,py+1,'#FFDAB9'); p(px+2,py+1,'#FFDAB9'); p(px+3,py+1,'#FFDAB9');
+    if (sleeping) {
+      p(px+1,py+1,'#2C1810'); p(px+2,py+1,'#2C1810'); // 閉眼
+      if (Math.floor(t/10)%2===0) { // ZZZ
+        p(px+1,py-3,'#999'); p(px+2,py-3,'#999'); p(px+3,py-3,'#999');
+        p(px+3,py-4,'#777'); p(px+4,py-4,'#777'); p(px+2,py-4,'#777');
+        p(px+4,py-5,'#555'); p(px+5,py-5,'#555'); p(px+3,py-5,'#555');
+      }
+    } else {
+      p(px+1,py+1,'#2C1810'); p(px+3,py+1,'#2C1810'); // 醒來睜眼
+      p(px,py+1,'#FFB3BA'); p(px+3,py+2,'#FFB3BA');   // 臉紅
+    }
+    for (let dx=3; dx<=10; dx++) p(px+dx,py,  '#1565C0'); // 身體
+    for (let dx=3; dx<=10; dx++) p(px+dx,py+1,'#1565C0');
+    p(px+5,py,'#FFD700'); // 金釦
+    p(px+8,py+2,'#eee'); p(px+9,py+2,'#eee'); p(px+10,py+2,'#eee'); p(px+11,py+2,'#eee');
+    p(px+6,py+2,'#eee'); p(px+7,py+2,'#eee');
+    p(px+11,py+2,'#1565C0'); p(px+12,py+2,'#1565C0'); p(px+12,py+3,'#1565C0');
+    p(px+5, py+2,'#1565C0'); p(px+6, py+2,'#1565C0'); p(px+5, py+3,'#1565C0');
   }
 
-  // 胖女生（紅髮、紫衣、不同於主角）
-  function fatGirl(ox, oy) {
+  // 公主（跑步或前傾親吻）
+  function princess(ox, oy, kissing) {
     const run = Math.floor(t/6)%2;
     const x = ox, y = oy;
-    // 頭髮 (紅色 蓬鬆)
-    p(x,y,'#c0392b'); p(x+1,y,'#c0392b'); p(x+2,y,'#c0392b'); p(x+3,y,'#c0392b'); p(x+4,y,'#c0392b'); p(x+5,y,'#c0392b');
-    p(x-1,y+1,'#c0392b'); p(x+6,y+1,'#c0392b');
-    // 臉 (寬圓臉)
-    p(x,y+1,'#FFDAB9'); p(x+1,y+1,'#FFDAB9'); p(x+2,y+1,'#FFDAB9'); p(x+3,y+1,'#FFDAB9'); p(x+4,y+1,'#FFDAB9'); p(x+5,y+1,'#FFDAB9');
-    p(x,y+2,'#FFDAB9'); p(x+1,y+2,'#FFDAB9'); p(x+2,y+2,'#FFDAB9'); p(x+3,y+2,'#FFDAB9'); p(x+4,y+2,'#FFDAB9'); p(x+5,y+2,'#FFDAB9');
-    // 心心眼
-    p(x+1,y+2,'#FF4DA6'); p(x+4,y+2,'#FF4DA6');
-    // 嘟嘴
-    p(x+2,y+3,'#cc0000'); p(x+3,y+3,'#cc0000');
-    // 腮紅
-    p(x,y+2,'#FFB3BA'); p(x+5,y+2,'#FFB3BA');
-    // 胖身體（紫色）
-    for (let dy=0; dy<=3; dy++) {
-      const w = dy<=1 ? 8 : 9;
-      for (let dx=0; dx<w; dx++) p(x-1+dx, y+4+dy, '#7b2d8b');
-    }
-    // 裙 (寬裙)
-    for (let dx=-2; dx<=8; dx++) p(x+dx, y+8, '#9b59b6');
-    for (let dx=-3; dx<=9; dx++) p(x+dx, y+9, '#9b59b6');
-    for (let dx=-2; dx<=8; dx++) p(x+dx, y+10, '#9b59b6');
-    // 腿 (跑步擺動)
-    if (run === 0) {
-      p(x,y+11,'#FFDAB9'); p(x+1,y+11,'#FFDAB9'); p(x+4,y+12,'#FFDAB9'); p(x+5,y+12,'#FFDAB9');
-      p(x-1,y+12,'#555'); p(x,y+12,'#555'); p(x+5,y+13,'#555'); p(x+6,y+13,'#555');
-    } else {
-      p(x+4,y+11,'#FFDAB9'); p(x+5,y+11,'#FFDAB9'); p(x,y+12,'#FFDAB9'); p(x+1,y+12,'#FFDAB9');
-      p(x+5,y+12,'#555'); p(x+6,y+12,'#555'); p(x-1,y+13,'#555'); p(x,y+13,'#555');
-    }
-  }
-
-  // 男生（跑步逃跑）
-  function runningGuy(ox, oy) {
-    const run = Math.floor(t/6)%2;
-    const x = ox, y = oy;
-    // 頭 (回頭看)
-    p(x,y,'#2C1810'); p(x+1,y,'#2C1810'); p(x+2,y,'#2C1810'); p(x+3,y,'#2C1810');
-    p(x,y+1,'#FFDAB9'); p(x+1,y+1,'#FFDAB9'); p(x+2,y+1,'#FFDAB9'); p(x+3,y+1,'#FFDAB9');
-    // 驚恐眼 (向左看)
-    p(x,y+1,'#2C1810'); p(x+1,y+2,'#2C1810'); p(x+3,y+2,'#FFDAB9');
-    // 汗水
-    if (Math.floor(t/5)%2===0) p(x+4,y,'#00e5ff');
-    // 身體前傾
-    p(x+1,y+3,'#444'); p(x+2,y+3,'#444'); p(x+3,y+3,'#444');
-    p(x,y+4,'#444'); p(x+1,y+4,'#444'); p(x+2,y+4,'#444');
-    p(x,y+5,'#444'); p(x+1,y+5,'#444');
-    // 手臂前後擺
-    if (run === 0) {
-      p(x+3,y+3,'#FFDAB9'); p(x+4,y+3,'#FFDAB9'); // 前手
-      p(x-1,y+5,'#FFDAB9');                         // 後手
-    } else {
-      p(x+3,y+5,'#FFDAB9'); p(x+4,y+5,'#FFDAB9');
-      p(x-1,y+3,'#FFDAB9');
-    }
-    // 腿跑步
-    if (run === 0) {
-      p(x,y+6,'#333'); p(x+1,y+7,'#333');
-      p(x+2,y+6,'#333'); p(x+2,y+5,'#333');
-      p(x,y+8,'#555'); p(x+1,y+8,'#555');
-    } else {
-      p(x+2,y+6,'#333'); p(x+1,y+7,'#333');
-      p(x,y+6,'#333'); p(x,y+5,'#333');
-      p(x+2,y+8,'#555'); p(x+3,y+8,'#555');
+    p(x+1,y-1,'#FFD700'); p(x+2,y-1,'#FFD700'); p(x+3,y-1,'#FFD700');
+    p(x,y-2,'#FFD700'); p(x+2,y-2,'#FFD700'); p(x+4,y-2,'#FFD700');
+    p(x,y,'#FFD700'); p(x+1,y,'#FFD700'); p(x+2,y,'#FFD700'); p(x+3,y,'#FFD700'); p(x+4,y,'#FFD700');
+    p(x-1,y+1,'#FFD700'); p(x+5,y+1,'#FFD700');
+    p(x,y+1,'#FFDAB9'); p(x+1,y+1,'#FFDAB9'); p(x+2,y+1,'#FFDAB9'); p(x+3,y+1,'#FFDAB9'); p(x+4,y+1,'#FFDAB9');
+    p(x,y+2,'#FFDAB9'); p(x+1,y+2,'#FFDAB9'); p(x+2,y+2,'#FFDAB9'); p(x+3,y+2,'#FFDAB9'); p(x+4,y+2,'#FFDAB9');
+    p(x+1,y+2,'#FF4DA6'); p(x+3,y+2,'#FF4DA6');
+    p(x,y+2,'#FFB3BA'); p(x+4,y+2,'#FFB3BA');
+    p(x+2,y+3, kissing ? '#FF4DA6' : '#cc4466');
+    if (kissing) { p(x+1,y+3,'#FF4DA6'); p(x+5,y+3,'#FFDAB9'); p(x+6,y+4,'#FFDAB9'); }
+    for (let dx=0; dx<=4; dx++) p(x+dx,y+4,'#FF69B4');
+    for (let dx=0; dx<=4; dx++) p(x+dx,y+5,'#FF69B4');
+    for (let dx=-1; dx<=6; dx++) p(x+dx,y+6,'#FFB6C1');
+    for (let dx=-2; dx<=7; dx++) p(x+dx,y+7,'#FFB6C1');
+    for (let dx=-3; dx<=8; dx++) p(x+dx,y+8,'#FF69B4');
+    for (let dx=-3; dx<=8; dx++) p(x+dx,y+9,'#FFB6C1');
+    for (let dx=-2; dx<=7; dx++) p(x+dx,y+10,'#FF69B4');
+    for (let dx=-3; dx<=8; dx+=2) p(x+dx,y+10,'#fff');
+    if (!kissing) {
+      if (run===0) {
+        p(x,y+11,'#FFDAB9'); p(x+1,y+11,'#FFDAB9'); p(x+3,y+12,'#FFDAB9'); p(x+4,y+12,'#FFDAB9');
+        p(x-1,y+12,'#FFD700'); p(x,y+12,'#FFD700'); p(x+4,y+13,'#FFD700'); p(x+5,y+13,'#FFD700');
+      } else {
+        p(x+3,y+11,'#FFDAB9'); p(x+4,y+11,'#FFDAB9'); p(x,y+12,'#FFDAB9'); p(x+1,y+12,'#FFDAB9');
+        p(x+4,y+12,'#FFD700'); p(x+5,y+12,'#FFD700'); p(x-1,y+13,'#FFD700'); p(x,y+13,'#FFD700');
+      }
     }
   }
 
   function draw() {
     ctx.fillStyle = '#0a0a1a'; ctx.fillRect(0, 0, cv.width, cv.height);
-    for (let x = 0; x < CW; x++) { p(x,CH-2,'#1a1a1a'); p(x,CH-1,'#222'); }
+    [[5,1],[18,2],[35,1],[52,3],[66,1]].forEach(([sx,sy],i) => {
+      p(sx,sy, Math.floor((t+i*9)/14)%2===0 ? '#FFD700' : '#444');
+    });
+    for (let x = 0; x < CW; x++) {
+      p(x,CH-3,'#1a1a2e'); p(x,CH-2,'#16213e'); p(x,CH-1,'#0f3460');
+    }
 
     const phase = t % CYCLE;
-    const caught = phase > 110; // 追到了
+    const kissing = phase > 105;
+    const princeX = 44, princeY = CH - 6;
+    const baseY   = CH - 16;
+    const targetX = princeX - 8;
+    const princessX = kissing
+      ? targetX
+      : Math.max(-6, Math.floor(-6 + phase * ((targetX + 6) / 105)));
 
-    // 胖女生位置：從左追
-    const girlX = Math.min(Math.floor(phase * 0.45), 40);
-    // 男生位置：往右逃
-    const guyX  = caught ? girlX + 8 : Math.min(6 + Math.floor(phase * 0.35), 50);
-    const baseY = CH - 15;
+    sleepingPrince(princeX, princeY, !kissing);
+    princess(princessX, baseY, kissing);
 
-    fatGirl(girlX, baseY);
-    runningGuy(guyX, baseY + 1);
-
-    if (caught) {
-      // 親嘴
-      if (Math.floor(t/6)%2===0) {
-        kiss(guyX - 3, baseY, '#FF4DA6');
-      } else {
-        heart(guyX - 4, baseY - 1, '#FF4DA6');
-      }
-      // 問號/驚嘆
-      if (Math.floor(t/8)%2===0) {
-        p(guyX+5,baseY-2,'#ffe600'); p(guyX+5,baseY-1,'#ffe600'); p(guyX+5,baseY+1,'#ffe600');
-      }
-    }
-
-    // 飛心（追跑時）
-    if (!caught) {
-      [{x:girlX+2,y:baseY-2,c:'#FF4DA6',sp:8},{x:girlX,y:baseY-4,c:'#FF69B4',sp:10}]
-      .forEach(({x,y,c,sp},i) => {
-        const off = Math.floor((t+i*15)/sp)%7;
-        if (off<5) heart(x, y-off, c);
+    if (kissing) {
+      [{x:princeX-4,y:princeY-5,c:'#FF4DA6',sp:9},
+       {x:princeX+1,y:princeY-6,c:'#FFD700',sp:7},
+       {x:princeX+6,y:princeY-4,c:'#FF69B4',sp:11},
+       {x:princeX-8,y:princeY-3,c:'#FFD700',sp:8}
+      ].forEach(({x,y,c,sp},i) => {
+        const off = Math.floor((t+i*19)/sp)%9;
+        if (off<7) heart(x, y-off, c);
       });
-    }
-
-    // 速度線（追跑時）
-    if (!caught) {
-      const lineY = baseY + 5;
-      for (let i=0; i<4; i++) {
-        const lx = ((girlX - i*6 - Math.floor(t/2)%6 + 72) % 72);
-        p(lx, lineY+i*2, '#333'); p(lx+1, lineY+i*2, '#333'); p(lx+2, lineY+i*2, '#333');
+      if (Math.floor(t/5)%3===0) {
+        p(princeX+2,princeY-7,'#FFD700'); p(princeX+3,princeY-8,'#FFD700'); p(princeX+1,princeY-8,'#FFD700');
+      }
+    } else {
+      const off = Math.floor(t/9)%8;
+      if (off<6) heart(princessX+2, baseY-2-off, '#FF4DA6');
+      for (let i=0; i<3; i++) {
+        const lx = ((princessX-3 - i*7 - Math.floor(t/2)%7 + 72) % 72);
+        if (lx < princessX) { p(lx,CH-5+i,'#1a1a3a'); p(lx+1,CH-5+i,'#1a1a3a'); }
       }
     }
+
+    [[3,3],[14,4],[58,3],[67,2]].forEach(([sx,sy],i) => {
+      if (Math.floor((t+i*13)/8)%3===0) {
+        p(sx,sy,'#FFD700'); p(sx+1,sy-1,'#FFD700'); p(sx-1,sy+1,'#FFD700');
+        p(sx+1,sy+1,'#FFD700'); p(sx-1,sy-1,'#FFD700');
+      }
+    });
+
+    t++;
+    _stageAnimId = requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+// ═══════════════════════════════════════════
+//  STAGE 3 SCENE ANIMATION
+// ═══════════════════════════════════════════
+function startStage3Scene(container) {
+  const PX = 4, CW = 80, CH = 32;
+  const cv = document.createElement('canvas');
+  cv.width = CW * PX; cv.height = CH * PX;
+  cv.style.cssText = 'image-rendering:pixelated;width:100%;max-width:380px;display:block;border:2px solid #1a3a1a;';
+  container.appendChild(cv);
+  const ctx = cv.getContext('2d');
+  const p = (x, y, c) => {
+    if (x < 0 || x >= CW || y < 0 || y >= CH) return;
+    ctx.fillStyle = c; ctx.fillRect(x*PX, y*PX, PX, PX);
+  };
+  let t = 0;
+
+  // 螢火蟲
+  const flies = Array.from({length: 8}, (_, i) => ({
+    x: 12 + i * 8, y: 5 + (i % 4) * 4,
+    vx: (i%2===0 ? 0.12 : -0.12), phase: i * 17,
+  }));
+
+  // 貓 (3寬 5高)
+  function cat(cx, cy, blink) {
+    p(cx,  cy,   '#4a4a6a'); p(cx+2,cy,   '#4a4a6a'); // 耳朵
+    p(cx,  cy+1,'#7a7a9a'); p(cx+1,cy+1,'#7a7a9a'); p(cx+2,cy+1,'#7a7a9a'); // 頭
+    p(cx,  cy+2,'#7a7a9a'); p(cx+2,cy+2,'#7a7a9a');
+    if (!blink) { p(cx+1,cy+2,'#00e5ff'); } else { p(cx+1,cy+2,'#3a3a5a'); } // 眼睛
+    p(cx,  cy+3,'#5a5a7a'); p(cx+1,cy+3,'#5a5a7a'); p(cx+2,cy+3,'#5a5a7a'); // 身體
+    p(cx,  cy+4,'#5a5a7a'); p(cx+1,cy+4,'#5a5a7a'); p(cx+2,cy+4,'#5a5a7a');
+    p(cx+3,cy+3,'#4a4a6a'); p(cx+3,cy+4,'#3a3a5a'); // 尾巴
+  }
+
+  function draw() {
+    ctx.fillStyle = '#060e08'; ctx.fillRect(0, 0, cv.width, cv.height);
+
+    // 星星
+    [[2,1],[7,0],[16,2],[26,0],[38,1],[50,2],[60,0],[70,1],[76,2]].forEach(([sx,sy],i) => {
+      p(sx,sy, Math.floor((t+i*13)/15)%4!==0 ? '#2a4a2a' : '#4a7a4a');
+    });
+
+    // 左側大樹
+    for (let dy=0; dy<22; dy++) {
+      const hw = Math.floor(dy*8/22);
+      for (let dx=-hw; dx<=hw; dx++) p(5+dx, 2+dy, dy<11 ? '#0d250d' : '#0a1f0a');
+    }
+    p(5,24,'#1a0f05'); p(5,25,'#1a0f05');
+    // 左側小樹
+    for (let dy=0; dy<14; dy++) {
+      const hw = Math.floor(dy*4/14);
+      for (let dx=-hw; dx<=hw; dx++) p(12+dx, 10+dy, '#0b1e0b');
+    }
+    p(12,24,'#1a0f05');
+
+    // 右側大樹
+    for (let dy=0; dy<20; dy++) {
+      const hw = Math.floor(dy*7/20);
+      for (let dx=-hw; dx<=hw; dx++) p(73+dx, 4+dy, dy<10 ? '#0d250d' : '#0a1f0a');
+    }
+    p(73,24,'#1a0f05'); p(73,25,'#1a0f05');
+    // 右側小樹
+    for (let dy=0; dy<12; dy++) {
+      const hw = Math.floor(dy*4/12);
+      for (let dx=-hw; dx<=hw; dx++) p(67+dx, 12+dy, '#0b1e0b');
+    }
+    p(67,24,'#1a0f05');
+
+    // 地面
+    for (let x=0; x<CW; x++) { p(x,26,'#0a180a'); p(x,27,'#0c1c0c'); }
+
+    // 溪流（底部，波光粼粼）
+    for (let x=16; x<64; x++) {
+      const rp = Math.floor((t*0.7 + x*2.5)) % 12;
+      const rc = rp < 4 ? '#122a4a' : rp < 8 ? '#1a3a60' : '#122a4a';
+      p(x, 28, rc); p(x, 29, '#0e2238');
+    }
+    // 溪流光點
+    if (Math.floor(t/5)%3===0) {
+      [22,31,42,53].forEach(lx => p(lx, 28, '#4a8ab0'));
+    }
+
+    // 石門兩柱
+    const gx = 31, gy = 7;
+    for (let dy=0; dy<18; dy++) {
+      p(gx,   gy+dy, '#333'); p(gx+1, gy+dy, '#484848'); // 左柱
+      p(gx+16,gy+dy, '#333'); p(gx+17,gy+dy, '#484848'); // 右柱
+    }
+    // 石門橫樑
+    for (let dx=0; dx<=17; dx++) { p(gx+dx,gy,'#484848'); p(gx+dx,gy+1,'#555'); }
+    // 門內光暈
+    const gPhase = Math.floor(t/10)%3;
+    const gInner = ['#0a1a0a','#0c200c','#0e260e'][gPhase];
+    for (let dy=2; dy<18; dy++) for (let dx=2; dx<16; dx++) p(gx+dx,gy+dy,gInner);
+    // 符文（閃爍）
+    const runeOn = Math.floor(t/7)%2===0;
+    const runeC = runeOn ? '#3cb371' : '#1a5c2a';
+    // 符文 1
+    p(gx+4,gy+4,runeC); p(gx+5,gy+4,runeC);
+    p(gx+4,gy+5,runeC); p(gx+6,gy+5,runeC);
+    p(gx+4,gy+6,runeC); p(gx+5,gy+6,runeC);
+    // 符文 2
+    p(gx+9, gy+4,runeC); p(gx+11,gy+4,runeC);
+    p(gx+10,gy+5,runeC);
+    p(gx+9, gy+6,runeC); p(gx+11,gy+6,runeC);
+    // 銅幣（地上發光）
+    const coinC = ['#8B6914','#c8960c','#daa520','#c8960c'][Math.floor(t/10)%4];
+    p(gx+8,gy+14,coinC); p(gx+9,gy+14,coinC);
+    p(gx+8,gy+15,coinC); p(gx+9,gy+15,coinC);
+
+    // 兩隻貓
+    const blink1 = Math.floor(t/25)%10===0;
+    const blink2 = Math.floor(t/20)%10===0;
+    cat(20, 21, blink1); // 左貓
+    cat(54, 21, blink2); // 右貓
+
+    // 螢火蟲
+    flies.forEach((f, i) => {
+      f.x += f.vx + Math.sin(t*0.04 + f.phase)*0.2;
+      f.y += Math.cos(t*0.03 + f.phase)*0.15 - 0.02;
+      if (f.y < 1) { f.y = 24; f.x = 15 + Math.random()*50; }
+      if (f.x < 8)  f.vx = Math.abs(f.vx);
+      if (f.x > 70) f.vx = -Math.abs(f.vx);
+      if (Math.floor((t + f.phase)/7)%2===0) p(Math.round(f.x), Math.round(f.y), '#7fff90');
+    });
 
     t++;
     _stageAnimId = requestAnimationFrame(draw);
@@ -999,6 +1113,7 @@ function renderContent(stage) {
   const box = document.getElementById('stage-content');
   if (stage.type === 'choice') renderChoice(box, stage);
   else if (stage.type === 'password') renderPW(box, stage);
+  else if (stage.type === 'button') renderButton(box, stage);
   else if (stage.type === 'coop-c') renderCoopC(box, stage);
   else if (stage.type === 'coop-a') renderCoopA(box, stage);
 }
@@ -1048,11 +1163,15 @@ function renderPW(box, stage) {
       res.className='result fail'; res.textContent=stage.wrong; sndErr();
     }
   };
-  btn.onclick = check; inp.onkeydown = e => e.key==='Enter' && check();
+  let composing = false;
+  inp.addEventListener('compositionstart', () => composing = true);
+  inp.addEventListener('compositionend',   () => { composing = false; });
+  btn.onclick = check;
+  inp.addEventListener('keydown', e => e.key === 'Enter' && !composing && check());
   area.appendChild(inp); area.appendChild(btn);
   box.appendChild(area); box.appendChild(res);
   setTimeout(() => inp.focus(), 100);
-  box.addEventListener('click', () => inp.focus());
+  document.querySelector('.dialog-box').addEventListener('click', () => inp.focus());
 }
 
 function renderCoopC(box, stage) {
@@ -1127,6 +1246,15 @@ function renderCoopA(box, stage) {
   tabs.appendChild(t1); tabs.appendChild(t2);
   box.appendChild(tabs); box.appendChild(qa); box.appendChild(res);
   showQ(cur);
+}
+
+function renderButton(box, stage) {
+  const btn = document.createElement('button');
+  btn.className = 'px-btn-main';
+  btn.style.marginTop = '16px';
+  btn.textContent = stage.btnText;
+  btn.onclick = () => { sndOk(); btn.disabled = true; setTimeout(() => completeStage(stage), 800); };
+  box.appendChild(btn);
 }
 
 function mkResult() {
