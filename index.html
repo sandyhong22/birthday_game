@@ -160,6 +160,7 @@ body {
   font-size: 13px; line-height: 2.2; color: #e8e8e8;
   min-height: 56px; max-height: 38vh; overflow-y: auto;
   outline: none; user-select: none; -webkit-user-select: none;
+  text-align: center !important;
 }
 .dialog-text::-webkit-scrollbar { width: 4px; }
 .dialog-text::-webkit-scrollbar-thumb { background: #444; border-radius: 2px; }
@@ -224,6 +225,7 @@ body {
   justify-content: center; gap: 14px;
   padding: 20px 16px; background: #0a0a1a; text-align: center;
 }
+#screen-ending * { text-align: center !important; }
 .end-chars { display: flex; justify-content: center; gap: 28px; align-items: flex-end; }
 /* rainbow card */
 .end-card {
@@ -250,7 +252,7 @@ body {
   font-size: 8px; color: #b44fff; letter-spacing: 4px;
   text-shadow: 0 0 8px #b44fff; margin: 8px 0;
 }
-#end-text { font-size: 13px; line-height: 2.4; text-align: left; }
+#end-text { font-size: 13px; line-height: 2.4; text-align: center; }
 #end-names {
   font-size: 13px; color: #ff4da6; margin-top: 12px; line-height: 2.2;
   text-shadow: 0 0 10px #ff4da6, 0 0 24px #ff4da6;
@@ -349,7 +351,7 @@ body {
       <canvas id="cake-cv"></canvas>
       <div class="end-card-title">🎉 QUEST COMPLETE! 🎉</div>
       <div class="end-deco">✦ ───── ✦ ───── ✦</div>
-      <div id="end-text"></div>
+      <div id="end-text" style="text-align:center"></div>
       <div class="end-deco">✦ ───── ✦ ───── ✦</div>
       <div id="end-names">🌟 壽星甲 &amp; 壽星乙 🌟<br>生日快樂！</div>
     </div>
@@ -398,7 +400,7 @@ const STAGES = [
     right: '✅ 正確！就是青蛙！羅笨至今仍有陰影...',
   },
   {
-    id: 2, scene: '🏰',
+    id: 2, scene: '🚪',
     npcAv: '🔮', npcNm: '守門魔法師',
     type: 'choice',
     dialog: '要通過這道門，\n必須回答問題！\n\n在潘朵拉的盒子中\n小夏同學看到\n某位神秘人\n跟資傳陸大學霸\n進行親密接觸...\n\n那位神秘人的姓氏為何？',
@@ -426,7 +428,7 @@ const STAGES = [
     npcAv: '✉️', npcNm: '神秘信使',
     type: 'password',
     dialog: '親愛的勇者阿\n\n想要禮物嗎？\n想要的話，\n就靠自己的力量來拿吧！\n\n我們已經把線索\n散落在各個角落，\n等著你們一一發現。\n\n只要集齊所有線索，\n拼湊出最後的答案——\n\n禮物，就會屬於你們。\n\n祝你們好運\n\n輸入寶藏所在地：',
-    answer: '快煮壺',
+    answer: ['快煮壺', '熱水壺'],
     hint: '輸入答案...',
     wrong: '❌ 還沒找到！繼續尋寶！',
     right: '✅ 找到了！寶藏就在那裡！',
@@ -434,7 +436,7 @@ const STAGES = [
   {
     id: 5, scene: '🎁',
     npcAv: '🎊', npcNm: '寶藏箱',
-    type: 'button',
+    type: 'button', dialogAlign: 'center',
     dialog: '恭喜你們——\n\n所有線索\n都已集齊！\n\n歷經重重關卡，\n寶藏終於\n來到你們手中。\n\n準備好了嗎？\n按下按鈕，\n開啟你們的祝福！',
     btnText: '✨ 打開祝福卡片',
   },
@@ -672,7 +674,7 @@ function showScreen(id) {
 let tyTimer;
 function typeText(elId, text, cb) {
   const el = document.getElementById(elId);
-  el.innerHTML = ''; let i = 0;
+  el.innerHTML = ''; el.style.textAlign = 'center'; let i = 0;
   clearInterval(tyTimer);
   tyTimer = setInterval(() => {
     if (i < text.length) {
@@ -741,6 +743,7 @@ function enterStage(stage) {
   document.getElementById('npc-tp').textContent = `STAGE ${idx+1}`;
   document.getElementById('scene-emoji').textContent = stage.scene;
   document.getElementById('stage-content').innerHTML = '';
+  document.getElementById('dialog-text').style.textAlign = stage.dialogAlign || '';
   // Draw chars
   initChars(6, null, false);
   showScreen('screen-stage');
@@ -1180,7 +1183,8 @@ function renderPW(box, stage) {
   const btn = document.createElement('button'); btn.className = 'px-btn'; btn.textContent = '▶ CONFIRM';
   const res = mkResult();
   const check = () => {
-    if (inp.value.toUpperCase().trim() === stage.answer.toUpperCase()) {
+    const answers = Array.isArray(stage.answer) ? stage.answer : [stage.answer];
+    if (answers.some(a => inp.value.trim().toUpperCase() === a.toUpperCase())) {
       res.className='result ok'; res.textContent=stage.right; sndOk(); setTimeout(()=>completeStage(stage),1200);
     } else {
       res.className='result fail'; res.textContent=stage.wrong; sndErr();
@@ -1349,6 +1353,7 @@ function showEnding() {
   startCakeAnim(document.getElementById('cake-cv'));
   const el = document.getElementById('end-text');
   el.innerHTML = '';
+  el.style.textAlign = 'center';
   const txt = CFG.ending.join('\n');
   let i = 0;
   const iv = setInterval(() => {
