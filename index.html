@@ -221,21 +221,41 @@ body {
 
 /* ENDING */
 #screen-ending {
-  justify-content: center; gap: 16px;
-  padding: 24px 20px; background: #0a0a1a; text-align: center;
-}
-.end-title {
-  font-size: 16px; color: #ffe600; line-height: 1.8;
-  animation: glow 1s infinite alternate;
+  justify-content: center; gap: 14px;
+  padding: 20px 16px; background: #0a0a1a; text-align: center;
 }
 .end-chars { display: flex; justify-content: center; gap: 28px; align-items: flex-end; }
-.end-box {
+/* rainbow card */
+.end-card {
   width: 100%; max-width: 360px;
-  border: 4px solid #ff4da6; padding: 18px;
-  background: #0f0f2e;
+  padding: 3px;
+  background: linear-gradient(60deg,#ff4da6,#ffe600,#00e5ff,#b44fff,#00ff41,#ff4da6);
+  background-size: 400% 400%;
+  animation: rainbow-border 3s linear infinite;
+  box-shadow: 0 0 28px rgba(255,77,166,0.55), 0 0 56px rgba(0,229,255,0.25);
 }
-.end-text { font-size: 13px; line-height: 2.4; }
-.end-names { font-size: 14px; color: #ff4da6; margin-top: 14px; line-height: 2.2; }
+@keyframes rainbow-border {
+  0%{background-position:0% 50%} 100%{background-position:300% 50%}
+}
+.end-card-inner {
+  background: #07071a; padding: 18px 16px; text-align: center;
+}
+.end-card-title {
+  font-size: 13px; color: #ffe600; line-height: 2;
+  text-shadow: 0 0 14px #ffe600, 0 0 36px #ff8c00;
+  animation: glow 1s infinite alternate;
+  margin-bottom: 8px; letter-spacing: 1px;
+}
+.end-deco {
+  font-size: 8px; color: #b44fff; letter-spacing: 4px;
+  text-shadow: 0 0 8px #b44fff; margin: 8px 0;
+}
+#end-text { font-size: 13px; line-height: 2.4; text-align: left; }
+#end-names {
+  font-size: 13px; color: #ff4da6; margin-top: 12px; line-height: 2.2;
+  text-shadow: 0 0 10px #ff4da6, 0 0 24px #ff4da6;
+  animation: glow 1.2s infinite alternate;
+}
 
 #canvas-fw { position: fixed; inset: 0; pointer-events: none; z-index: 5; }
 
@@ -323,15 +343,18 @@ body {
 
 <!-- ENDING -->
 <div class="screen" id="screen-ending">
-  <div class="end-title">🎉 QUEST<br>COMPLETE!</div>
   <div class="end-chars" id="end-chars"></div>
-  <div class="end-box">
-    <div class="end-text" id="end-text"></div>
-    <div class="end-names" id="end-names">🌟 壽星甲 &amp; 壽星乙 🌟<br>生日快樂！</div>
+  <div class="end-card">
+    <div class="end-card-inner">
+      <canvas id="cake-cv"></canvas>
+      <div class="end-card-title">🎉 QUEST COMPLETE! 🎉</div>
+      <div class="end-deco">✦ ───── ✦ ───── ✦</div>
+      <div id="end-text"></div>
+      <div class="end-deco">✦ ───── ✦ ───── ✦</div>
+      <div id="end-names">🌟 壽星甲 &amp; 壽星乙 🌟<br>生日快樂！</div>
+    </div>
   </div>
-  <div style="font-size:7px;color:#444;line-height:2;padding:8px;text-align:center">
-    ♥ LV.27 BIRTHDAY QUEST ♥
-  </div>
+  <div style="font-size:7px;color:#444;line-height:2;padding:8px;text-align:center">♥ LV.27 BIRTHDAY QUEST ♥</div>
   <button class="px-btn-sub" onclick="resetGame()" style="max-width:280px;margin-bottom:20px">↺ PLAY AGAIN</button>
 </div>
 
@@ -392,7 +415,7 @@ const STAGES = [
     id: 3, scene: '🌲',
     npcAv: '📜', npcNm: '古老石板',
     type: 'password',
-    dialog: '石板上刻著一段神秘文字\n──────────────\n踏入古老的森林後，\n發現路旁刻著奇怪的符號\n\n兩隻貓靜靜坐在石頭上，\n像是在守護著什麼\n\n沿著小徑抵達第七棵樹時，\n地上有一枚銅幣散發微光\n\n穿過溪流，水面映出字樣：\n「歲華如歌，光陰不待人」\n\n再往前走，橋下溪水流淌，\n映照著生機盎然\n\n古老的石門上刻著\n『日影流轉，\n踏過此門者方得真寶』\n\n跨過石門爬上山丘，\n感受風的輕拂，\n願你們煩惱隨雲霧快速散去，\n祝你未來的每一刻\n都活得怡然自樂\n──────────────\n致勇者：\n線索已埋藏在古老的傳說中。\n唯有尋獲暗語者，\n才能進入最後一關！\n\n輸入暗語：',
+    dialog: '石板上刻著一段神秘文字\n──────────────\n踏入古老的森林後，\n發現路旁刻著奇怪的符號\n\n兩隻貓靜靜坐在石頭上，\n像是在守護著什麼\n\n沿著小徑抵達第七棵樹時，\n地上有一枚銅幣散發微光\n\n穿過溪流，水面映出字樣：\n「歲華如歌，光陰不待人」\n\n再往前走，橋下溪水流淌，\n映照著生機盎然\n\n古老的石門上刻著\n『日影流轉，\n踏過此門者方得真寶』\n\n跨過石門爬上山丘，\n感受風的輕拂，\n願你們煩惱隨雲霧快速散去\n\n祝你未來的每一刻\n都活得怡然自樂\n\n致勇者：\n線索已埋藏在古老的傳說中。\n唯有尋獲暗語者，才能進入最後一關獲得最終寶藏！\n\n輸入暗語：',
     answer: '27歲生日快樂',
     hint: '輸入暗語...',
     wrong: '❌ 暗語錯誤！線索就在文字中...',
@@ -403,17 +426,17 @@ const STAGES = [
     npcAv: '✉️', npcNm: '神秘信使',
     type: 'password',
     dialog: '親愛的勇者阿\n\n想要禮物嗎？\n想要的話，\n就靠自己的力量來拿吧！\n\n我們已經把線索\n散落在各個角落，\n等著你們一一發現。\n\n只要集齊所有線索，\n拼湊出最後的答案——\n\n禮物，就會屬於你們。\n\n祝你們好運\n\n輸入寶藏所在地：',
-    answer: '待定',
+    answer: '快煮壺',
     hint: '輸入答案...',
     wrong: '❌ 還沒找到！繼續尋寶！',
     right: '✅ 找到了！寶藏就在那裡！',
   },
   {
-    id: 5, scene: '🗺️',
-    npcAv: '🧭', npcNm: '冒險地圖',
+    id: 5, scene: '🎁',
+    npcAv: '🎊', npcNm: '寶藏箱',
     type: 'button',
-    dialog: '所有線索\n都已就位。\n\n寶藏，\n正在等待你們。\n\n勇者啊——\n\n準備好了嗎？',
-    btnText: '出發吧勇者',
+    dialog: '恭喜你們——\n\n所有線索\n都已集齊！\n\n歷經重重關卡，\n寶藏終於\n來到你們手中。\n\n準備好了嗎？\n按下按鈕，\n開啟你們的祝福！',
+    btnText: '✨ 打開祝福卡片',
   },
 ];
 
@@ -1170,7 +1193,10 @@ function renderPW(box, stage) {
   inp.addEventListener('keydown', e => e.key === 'Enter' && !composing && check());
   area.appendChild(inp); area.appendChild(btn);
   box.appendChild(area); box.appendChild(res);
-  setTimeout(() => inp.focus(), 100);
+  setTimeout(() => {
+    area.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    inp.focus();
+  }, 150);
   document.querySelector('.dialog-box').addEventListener('click', () => inp.focus());
 }
 
@@ -1262,6 +1288,57 @@ function mkResult() {
 }
 
 // ═══════════════════════════════════════════
+//  CAKE ANIMATION
+// ═══════════════════════════════════════════
+function startCakeAnim(canvas) {
+  const PX = 5, W = 44, H = 22;
+  canvas.width = W * PX; canvas.height = H * PX;
+  canvas.style.cssText = 'image-rendering:pixelated;display:block;margin:0 auto 14px;max-width:100%;';
+  const ctx = canvas.getContext('2d');
+  const p = (x, y, c) => {
+    if (x < 0 || x >= W || y < 0 || y >= H) return;
+    ctx.fillStyle = c; ctx.fillRect(x*PX, y*PX, PX, PX);
+  };
+  const CPOS = [9, 21, 33];
+  const CCOLS = ['#ff8888','#88ffaa','#88aaff'];
+  let t = 0;
+  function draw() {
+    ctx.fillStyle = '#07071a'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+    // Flames + candles
+    CPOS.forEach((cx, i) => {
+      const phase = Math.floor((t + i * 9) / 7) % 3;
+      const fc = ['#ffe600','#ff8c00','#ffcc00'][phase];
+      p(cx, 0, '#ff6600');
+      p(cx-1,1,fc); p(cx,1,fc); p(cx+1,1,'#ff6600');
+      p(cx,2,fc);
+      p(cx-1,3,CCOLS[i]); p(cx,3,'#fff'); p(cx+1,3,CCOLS[i]);
+      p(cx-1,4,CCOLS[i]); p(cx,4,'#fff'); p(cx+1,4,CCOLS[i]);
+      p(cx-1,5,CCOLS[i]); p(cx,5,'#fff'); p(cx+1,5,CCOLS[i]);
+    });
+    // Top frosting
+    for (let x=3;x<41;x++) p(x,6,'#fff');
+    [5,9,14,19,24,29,34,38].forEach(dx => { p(dx,7,'#fff'); p(dx,8,'#eee'); });
+    // Pink top tier
+    for (let y=7;y<12;y++) for (let x=3;x<41;x++) p(x,y,'#ff6eb4');
+    [6,12,18,24,30,36].forEach(dx => p(dx,9,'#fff'));
+    [9,15,21,27,33,38].forEach(dx => p(dx,10,'#ffe600'));
+    // Middle frosting
+    for (let x=2;x<42;x++) p(x,12,'#fff');
+    [4,9,15,21,27,33,38].forEach(dx => { p(dx,13,'#fff'); p(dx,14,'#eee'); });
+    // Yellow bottom tier
+    for (let y=13;y<19;y++) for (let x=2;x<42;x++) p(x,y,'#ffe566');
+    [5,12,20,28,36].forEach(dx => p(dx,15,'#ff4da6'));
+    [8,16,24,32,39].forEach(dx => p(dx,16,'#b44fff'));
+    [11,19,27,35].forEach(dx => p(dx,17,'#00e5ff'));
+    // Plate
+    for (let x=0;x<44;x++) { p(x,19,'#ccc'); p(x,20,'#aaa'); p(x,21,'#888'); }
+    t++;
+    requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+// ═══════════════════════════════════════════
 //  ENDING
 // ═══════════════════════════════════════════
 function showEnding() {
@@ -1269,6 +1346,7 @@ function showEnding() {
   document.getElementById('end-names').innerHTML = `🌟 ${CFG.p1Name} &amp; ${CFG.p2Name} 🌟<br>生日快樂！`;
   initChars(9, document.getElementById('end-chars'), true);
   startFW();
+  startCakeAnim(document.getElementById('cake-cv'));
   const el = document.getElementById('end-text');
   el.innerHTML = '';
   const txt = CFG.ending.join('\n');
